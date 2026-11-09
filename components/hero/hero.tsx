@@ -1,6 +1,8 @@
 import type { CSSProperties } from "react";
 import { GLYPHS_ID, WORDMARK_PATH } from "./wordmark-path";
 import { Wordmark } from "./wordmark";
+import { Menubar } from "./nav";
+import { TrailCursor } from "./trail-cursor";
 import "./hero.css";
 
 /**
@@ -72,7 +74,7 @@ type Vars = CSSProperties & Record<`--${string}`, string | number>;
 
 export function Hero() {
   return (
-    <section className="ns-hero" aria-labelledby="hero-title">
+    <section id="top" className="ns-hero" aria-labelledby="hero-title">
       <h1 id="hero-title" className="ns-hero__sr">
         Neelscript, your friendly neighbourhood developer
       </h1>
@@ -105,6 +107,9 @@ export function Hero() {
           <use href={`#${GLYPHS_ID}`} filter={`url(#${BLUR_ID})`} />
         </svg>
 
+        {/* 1b · film grain over paper + echo, under the grid */}
+        <div className="ns-hero__grain" aria-hidden="true" />
+
         {/* 2 · drafting grid */}
         <svg
           className="ns-hero__grid"
@@ -115,6 +120,10 @@ export function Hero() {
         >
           <path d={GRID_PATH} />
         </svg>
+
+        {/* 2b · trail pointer: its trail sits on the canvas here (under all
+            text); the pointer itself is lifted above everything (z-index) */}
+        <TrailCursor />
 
         {/* 3 · footer line (sits under the echo layer in the design stack) */}
         <p className="ns-hero__text ns-hero__footer">
@@ -133,6 +142,9 @@ export function Hero() {
             </li>
           ))}
         </ul>
+
+        {/* 4b · menubar */}
+        <Menubar />
 
         {/* 5 · tagline */}
         <p className="ns-hero__text ns-hero__tagline" aria-hidden="true">

@@ -332,6 +332,34 @@ export function Wordmark() {
           }
         };
 
+        // the trail pointer taps a letter: wobble it, or jump the word
+        const onPoke = (ev: Event) => {
+          const {
+            index = 0,
+            strength = 0.6,
+            jump: hard = false,
+            spread = 4,
+          } =
+            (
+              ev as CustomEvent<{
+                index?: number;
+                strength?: number;
+                jump?: boolean;
+                spread?: number;
+              }>
+            ).detail ?? {};
+          if (!hard) {
+            wobble(index, strength);
+            return;
+          }
+          for (let j = 0; j < LETTERS.length; j++) {
+            const n = Math.abs(j - index);
+            if (n > spread) continue;
+            jump(j, strength * 0.72 ** n, n * 0.07);
+          }
+        };
+        window.addEventListener("ns:poke", onPoke);
+
         window.addEventListener("pointermove", onMove, { passive: true });
         document.documentElement.addEventListener("pointerleave", onLeave);
         hero?.addEventListener("pointerleave", onLeave);
@@ -344,6 +372,7 @@ export function Wordmark() {
           gsap.ticker.remove(render);
           io.disconnect();
           window.removeEventListener("pointermove", onMove);
+          window.removeEventListener("ns:poke", onPoke);
           document.documentElement.removeEventListener("pointerleave", onLeave);
           hero?.removeEventListener("pointerleave", onLeave);
           paths.forEach((p) => {

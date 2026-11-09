@@ -49,6 +49,8 @@
      font's nominal cap height (measured on the 4K master). */
   --cap-offset-text: 0.1356em;
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* generated film grain tile (SVG fractal noise → grey, opaque) */
+  --ns-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g' x='0' y='0' width='100%25' height='100%25' color-interpolation-filters='sRGB'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0.33 0.33 0.33 0 0 0 0 0 0 1'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='1.9' intercept='-0.45'/%3E%3CfeFuncG type='linear' slope='1.9' intercept='-0.45'/%3E%3CfeFuncB type='linear' slope='1.9' intercept='-0.45'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
 
   position: relative;
   isolation: isolate;
@@ -123,6 +125,15 @@
   --gx: 0;
   --gy: 0;
 
+  /* menubar */
+  --nav-x: 570;
+  --nav-y: 44;
+  --nav-w: 780;
+  --nav-h: 72;
+  --nav-fs: 19;
+  --nav-num: 12.5;
+  --nav-pad: 32;
+
   /* type */
   --tag-size: 48;
   --tag-top: 179;
@@ -160,6 +171,14 @@
 
     --gx: -7.8; /* desktop grid, re-centred: (-420) mod 68.7 */
     --gy: -14.8; /* (+260) mod 68.7 */
+
+    --nav-x: 40;
+    --nav-y: 250;
+    --nav-w: 1000;
+    --nav-h: 90;
+    --nav-fs: 34;
+    --nav-num: 22;
+    --nav-pad: 0;
 
     --tag-size: 60;
     --tag-top: 400;
@@ -201,6 +220,66 @@
   pointer-events: none;
   /* pointer parallax (set by the wordmark's GSAP loop, design px) */
   translate: calc(var(--ex, 0) * var(--ue)) calc(var(--ey, 0) * var(--ue));
+}
+
+/* ------------------------------------------------------ 1b · grain ----- */
+/*
+   Film grain, generated (SVG fractal noise → grey, opaque), tiled at a fixed
+   180px so its density is the same physical size on every screen. It covers
+   the whole hero, sits over the paper and the blurred echo, and stays under
+   the grid and all content. Overlay blending adds texture without shifting
+   the palette. The tile jitters to a new offset 12x a second (stepped, not
+   sliding) for a live, filmic shimmer; transform-only, so it is composited.
+*/
+.ns-hero__grain {
+  --grain-tile: 180px;
+
+  position: absolute;
+  /* fill the hero (the stage's container), whatever its aspect */
+  inset-inline-start: calc(var(--cw) * var(--u) / 2 - 50cqw);
+  inset-block-start: calc(var(--ch) * var(--u) / 2 - 50cqh);
+  inline-size: 100cqw;
+  block-size: 100cqh;
+  overflow: hidden;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+}
+
+.ns-hero__grain::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--grain-tile) * -1);
+  background-image: var(--ns-grain);
+  background-size: var(--grain-tile) var(--grain-tile);
+  background-repeat: repeat;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ns-hero__grain::before {
+    animation: ns-hero-grain 0.84s steps(1) infinite;
+  }
+}
+
+/* offsets stay within one tile, so the oversized layer never shows an edge */
+@keyframes ns-hero-grain {
+  0% { transform: translate(0, 0); }
+  10% { transform: translate(-63px, 41px); }
+  20% { transform: translate(37px, -88px); }
+  30% { transform: translate(-121px, -27px); }
+  40% { transform: translate(84px, 112px); }
+  50% { transform: translate(-29px, 147px); }
+  60% { transform: translate(133px, 18px); }
+  70% { transform: translate(-96px, -134px); }
+  80% { transform: translate(52px, -45px); }
+  90% { transform: translate(-150px, 76px); }
+  100% { transform: translate(0, 0); }
+}
+
+@media print {
+  .ns-hero__grain {
+    display: none;
+  }
 }
 
 /* -------------------------------------------------------- 2 · grid ------ */
@@ -916,5 +995,208 @@
   100% {
     opacity: 0;
     translate: 0 0;
+  }
+}
+
+/* ------------------------------------------------------- menubar -------- */
+/*
+   Four numbered links set straight on the paper, in the hero's ink.
+   Hover / focus: the letters roll up in a staggered wave and the number
+   darkens to full ink.
+*/
+.ns-nav {
+  --nu: var(--u);
+
+  position: absolute;
+  inset-inline-start: calc(var(--nav-x) * var(--nu));
+  inset-block-start: calc(var(--nav-y) * var(--nu));
+  inline-size: calc(var(--nav-w) * var(--nu));
+  block-size: calc(var(--nav-h) * var(--nu));
+  color: var(--ink);
+}
+
+.ns-nav__list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  block-size: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ns-nav__item {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-inline-start: calc(var(--nav-pad) * var(--nu));
+}
+
+@container hero (orientation: portrait) {
+  .ns-nav__item {
+    justify-content: center;
+  }
+}
+
+.ns-nav__link {
+  position: relative;
+  display: inline-flex;
+  align-items: flex-start;
+  color: inherit;
+  font-size: calc(var(--nav-fs) * var(--nu));
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  text-decoration: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ns-nav__link:focus-visible {
+  outline: max(1px, 1.5 * var(--nu)) solid var(--ink);
+  outline-offset: calc(10 * var(--nu));
+}
+
+/* clip window for the letter roll: one line tall */
+.ns-nav__label {
+  position: relative;
+  display: inline-block;
+  overflow: hidden;
+  overflow: clip;
+  line-height: 1.2;
+}
+
+.ns-nav__roll {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.ns-nav__ch {
+  display: inline-block;
+  /* the incoming copy of each letter waits one line below */
+  text-shadow: 0 1.2em 0 currentColor;
+  transition: transform 0.62s cubic-bezier(0.7, 0, 0.2, 1);
+  transition-delay: calc(var(--c) * 24ms);
+}
+
+.ns-nav__link:is(:hover, :focus-visible) .ns-nav__ch {
+  transform: translateY(-1.2em);
+}
+
+.ns-nav__num {
+  position: relative;
+  inset-block-start: calc(-0.28 * var(--nav-fs) * var(--nu));
+  margin-inline-start: calc(0.6 * var(--nav-fs) * var(--nu));
+  color: rgb(0 0 0 / 0.42);
+  font-size: calc(var(--nav-num) * var(--nu));
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  vertical-align: baseline;
+  font-variant-numeric: tabular-nums;
+  transition: color 0.4s ease;
+}
+
+.ns-nav__link:is(:hover, :focus-visible) .ns-nav__num {
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ns-nav__item {
+    animation: ns-hero-rise 0.9s var(--ease-out)
+      calc(0.35s + var(--i) * 0.07s) backwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-nav__ch {
+    transition: none;
+  }
+}
+
+/* ------------------------------------------------------- trail pointer -- */
+/*
+   A big pointer (blue body, black keyline, thick white halo, soft shadow)
+   that has flown in along a dashed trail from the left edge and now rests
+   with its tip on the D. Drawn in design px; animated in trail-cursor.tsx.
+*/
+.ns-trail {
+  position: absolute;
+  display: block;
+  overflow: visible;
+  inset-inline-start: calc(-1700 * var(--u));
+  inset-block-start: 0;
+  inline-size: calc(3700 * var(--u));
+  block-size: calc(1080 * var(--u));
+  pointer-events: none;
+}
+
+/* the pointer layer rides above every other layer of the hero */
+.ns-trail--pointer {
+  z-index: 3;
+}
+
+.ns-trail__guide {
+  fill: none;
+  stroke: none;
+}
+
+.ns-trail__path {
+  fill: none;
+  stroke: var(--royal);
+  stroke-width: 5.83;
+  stroke-linecap: round;
+  /* 22 + round caps ≈ 28px dash, 30 − caps ≈ 24px gap (as in the design) */
+  stroke-dasharray: 22 30;
+}
+
+.ns-trail__halo {
+  fill: #ffffff;
+  stroke: #ffffff;
+  stroke-width: 30;
+  stroke-linejoin: round;
+}
+
+.ns-trail__body {
+  fill: var(--royal);
+  stroke: #000000;
+  stroke-width: 6.36;
+  stroke-linejoin: round;
+}
+
+.ns-trail__hit {
+  pointer-events: visiblePainted;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* no room beside the wordmark in the portrait composition */
+@container hero (orientation: portrait) {
+  .ns-trail {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* dashes keep flowing into the pointer (JS takes over once live) */
+  .ns-trail__path {
+    animation: ns-trail-flow 1.5s linear infinite;
+  }
+  .ns-trail[data-ready] .ns-trail__path {
+    animation: none;
+  }
+  /* live: the comet pieces replace the static design trail */
+  .ns-trail[data-ready] .ns-trail__path:not(.ns-trail__seg) {
+    display: none;
+  }
+
+  /* hidden until it flies in; if JS never arrives it fades in at rest */
+  .ns-trail:not([data-ready]) {
+    animation: ns-hero-fade-in 0.8s ease-out 1.6s backwards;
+  }
+}
+
+@keyframes ns-trail-flow {
+  to {
+    stroke-dashoffset: -52;
   }
 }
