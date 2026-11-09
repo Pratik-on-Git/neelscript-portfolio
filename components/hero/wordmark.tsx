@@ -4,6 +4,7 @@ import { useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { LETTERS } from "./letters";
+import { GLYPHS_ID } from "./wordmark-path";
 
 gsap.registerPlugin(useGSAP);
 
@@ -410,17 +411,24 @@ export function Wordmark() {
         })}
       </defs>
 
-      {order.map((i) => (
-        <g key={i} mask={i > 0 ? `url(#ns-letter-mask-${i})` : undefined}>
-          <path
-            id={`ns-letter-${i}`}
-            className="ns-hero__glyph"
-            data-i={i}
-            d={LETTERS[i].d}
-            fillRule="evenodd"
-          />
-        </g>
-      ))}
+      {/* Static views (reduced motion, no JS, before hydration): the exact
+          single-piece artwork. */}
+      <use href={`#${GLYPHS_ID}`} className="ns-hero__wordmark-art" />
+
+      {/* Live: nine complete letters, swapped in once the animation runs. */}
+      <g className="ns-hero__letters">
+        {order.map((i) => (
+          <g key={i} mask={i > 0 ? `url(#ns-letter-mask-${i})` : undefined}>
+            <path
+              id={`ns-letter-${i}`}
+              className="ns-hero__glyph"
+              data-i={i}
+              d={LETTERS[i].d}
+              fillRule="evenodd"
+            />
+          </g>
+        ))}
+      </g>
     </svg>
   );
 }

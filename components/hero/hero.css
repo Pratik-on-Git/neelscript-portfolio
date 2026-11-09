@@ -307,6 +307,17 @@
   fill: var(--royal);
 }
 
+/* Static art by default; the complete letters take over once GSAP is live. */
+.ns-hero__letters {
+  visibility: hidden;
+}
+.ns-hero__wordmark[data-live] .ns-hero__letters {
+  visibility: visible;
+}
+.ns-hero__wordmark[data-live] .ns-hero__wordmark-art {
+  visibility: hidden;
+}
+
 /* letters are interactive: hover wobbles, click jumps */
 .ns-hero__glyph {
   pointer-events: visiblePainted;

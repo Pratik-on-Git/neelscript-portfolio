@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import { WORDMARK_PATH } from "./wordmark-path";
+import { GLYPHS_ID, WORDMARK_PATH } from "./wordmark-path";
 import { Wordmark } from "./wordmark";
 import "./hero.css";
 
@@ -13,7 +13,6 @@ import "./hero.css";
  * dedicated 1080 x 1600 composition (see hero.css).
  */
 
-const GLYPHS_ID = "neelscript-developer-glyphs";
 const BLUR_ID = "neelscript-developer-blur";
 
 /* ---------------------------------------------------------------- grid --- */
@@ -78,7 +77,7 @@ export function Hero() {
         Neelscript, your friendly neighbourhood developer
       </h1>
 
-      {/* Glyph geometry + blur for the background echo. */}
+      {/* Glyph geometry (echo + static wordmark) and the echo blur. */}
       <svg className="ns-hero__defs" aria-hidden="true" focusable="false">
         <defs>
           <path id={GLYPHS_ID} d={WORDMARK_PATH} fillRule="evenodd" />
