@@ -140,6 +140,14 @@
   --nav-inset: 6; /* glass padding around the segments */
   --nav-fs: 22;
 
+  /* ceo card: same line as the menubar, right edge on the 62 outer margin */
+  --card-w: 304;
+  --card-h: 66; /* = --nav-h */
+  --card-x: 1554.4; /* 1920 - 61.6 - 304 */
+  --card-y: 61.6; /* = --nav-y */
+  --card-gap: 14;
+  --card-title: 19;
+
   /* type */
   --tag-size: 48;
   --tag-top: 281.9; /* menu bottom 127.6 + header gap 154.3 */
@@ -170,27 +178,34 @@
 
     --lk: 0.78;
     --lx: 47.04; /* 540 - 632 * 0.78 → wordmark centred */
-    --ly: 634.66; /* ink top lands on y 641.4 */
+    --ly: 712.66; /* ink top lands on y 719.4 */
 
     --gx: -7.8; /* desktop grid, re-centred: (-420) mod 68.7 */
     --gy: -14.8; /* (+260) mod 68.7 */
 
     /* Portrait hierarchy (1600 tall), the whole composition centred:
-         margin 331.4 · menu 100 · header gap 112 · tagline cap 42 · gap 56 ·
-         wordmark 331.6 · gap 56 · chips 239.7 · margin 331.3 */
+         margin 253.4 · card 100 · gap 56 · menu 100 · header gap 112 ·
+         tagline cap 42 · gap 56 · wordmark 331.6 · gap 56 · chips 239.7 ·
+         margin 253.3 */
     --shift-y: 0;
-    --nav-y: 331.4;
+    --card-w: 600;
+    --card-h: 100;
+    --card-x: 240;
+    --card-y: 253.4;
+    --card-gap: 20;
+    --card-title: 30;
+    --nav-y: 409.4;
     --nav-col: 246;
     --nav-h: 100;
     --nav-inset: 8;
     --nav-fs: 34;
 
     --tag-size: 60;
-    --tag-top: 543.4;
+    --tag-top: 621.4;
     --tag-cx: 540;
 
     --chips-x: 0;
-    --chips-y: 1029;
+    --chips-y: 1107;
     --chips-w: 1080;
     --chips-gap: 18;
     --ck: 1.4167; /* 34 / 24 */
@@ -1242,5 +1257,178 @@
 @keyframes ns-trail-flow {
   to {
     stroke-dashoffset: -52;
+  }
+}
+
+/* ------------------------------------------------------------ ceo card -- */
+/*
+   On the menubar's line: same top, same height and the same frosted glass,
+   right-aligned to the outer margin. Hover lifts it, eases the portrait in
+   and steps the pixel arrow toward its corner.
+*/
+.ns-ceo {
+  --cu: var(--u);
+
+  position: absolute;
+  inset-inline-start: calc(var(--card-x) * var(--cu));
+  inset-block-start: calc(var(--card-y) * var(--cu));
+  inline-size: calc(var(--card-w) * var(--cu));
+  block-size: calc(var(--card-h) * var(--cu));
+  box-sizing: border-box;
+  display: flex;
+  align-items: stretch;
+  gap: calc(var(--card-gap) * var(--cu));
+  padding: calc(var(--nav-inset) * var(--cu));
+  padding-inline-end: calc(var(--card-gap) * var(--cu));
+  border-radius: calc(10 * var(--cu));
+  color: var(--ink);
+  text-decoration: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  /* glass (same recipe as the menubar) */
+  background: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.62) 0%,
+    rgb(255 255 255 / 0.38) 100%
+  );
+  -webkit-backdrop-filter: blur(calc(16 * var(--cu))) saturate(1.5);
+  backdrop-filter: blur(calc(16 * var(--cu))) saturate(1.5);
+  border: max(1px, 1 * var(--cu)) solid rgb(255 255 255 / 0.75);
+  box-shadow:
+    0 0 0 max(0.5px, 0.5 * var(--cu)) rgb(0 0 0 / 0.07),
+    inset 0 max(1px, 1 * var(--cu)) 0 rgb(255 255 255 / 0.9),
+    0 calc(14 * var(--cu)) calc(34 * var(--cu)) calc(-16 * var(--cu))
+      rgb(20 30 60 / 0.22),
+    0 calc(2 * var(--cu)) calc(6 * var(--cu)) rgb(20 30 60 / 0.05);
+  transition:
+    translate 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.5s ease;
+}
+
+.ns-ceo:is(:hover, :focus-visible) {
+  translate: 0 calc(-2 * var(--cu));
+  box-shadow:
+    0 0 0 max(0.5px, 0.5 * var(--cu)) rgb(0 0 0 / 0.08),
+    inset 0 max(1px, 1 * var(--cu)) 0 rgb(255 255 255 / 0.95),
+    0 calc(20 * var(--cu)) calc(40 * var(--cu)) calc(-16 * var(--cu))
+      rgb(20 30 60 / 0.3),
+    0 calc(3 * var(--cu)) calc(8 * var(--cu)) rgb(20 30 60 / 0.06);
+}
+
+.ns-ceo:focus-visible {
+  outline: max(1px, 1.5 * var(--cu)) solid var(--royal);
+  outline-offset: calc(3 * var(--cu));
+}
+
+.ns-ceo__photo {
+  position: relative;
+  flex: none;
+  aspect-ratio: 1;
+  block-size: 100%;
+  overflow: hidden;
+  border-radius: calc(6 * var(--cu));
+  box-shadow: inset 0 0 0 max(0.5px, 0.5 * var(--cu)) rgb(0 0 0 / 0.08);
+}
+
+.ns-ceo__img,
+.ns-ceo__avatar {
+  position: absolute;
+  inset: 0;
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  transition: scale 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* hand-made ember avatar until a photo is supplied */
+.ns-ceo__avatar {
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(120% 90% at 30% 20%, #ff7a2f 0%, rgb(255 122 47 / 0) 55%),
+    radial-gradient(90% 90% at 80% 100%, #6e1204 0%, rgb(110 18 4 / 0) 70%),
+    linear-gradient(160deg, #e2400f 0%, #a3200a 55%, #2a0a05 100%);
+}
+
+.ns-ceo__initials {
+  color: rgb(255 255 255 / 0.92);
+  font-size: calc(var(--card-title) * 1.05 * var(--cu));
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.ns-ceo:is(:hover, :focus-visible) :is(.ns-ceo__img, .ns-ceo__avatar) {
+  scale: 1.07;
+}
+
+.ns-ceo__text {
+  display: flex;
+  flex: 1;
+  min-inline-size: 0;
+  flex-direction: column;
+  justify-content: center;
+  gap: calc(var(--card-title) * 0.12 * var(--cu));
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.ns-ceo__title {
+  font-size: calc(var(--card-title) * var(--cu));
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+.ns-ceo__name {
+  font-size: calc(var(--card-title) * 0.74 * var(--cu));
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.ns-ceo__role {
+  color: rgb(0 0 0 / 0.5);
+  font-size: calc(var(--card-title) * 0.66 * var(--cu));
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+.ns-ceo__arrow {
+  position: absolute;
+  inset-block-start: calc(var(--card-gap) * 0.85 * var(--cu));
+  inset-inline-end: calc(var(--card-gap) * 0.85 * var(--cu));
+  inline-size: calc(var(--card-title) * 0.62 * var(--cu));
+  block-size: calc(var(--card-title) * 0.62 * var(--cu));
+  overflow: hidden;
+  fill: var(--ink);
+}
+
+.ns-ceo__arrow-px {
+  transition: translate 0.45s steps(3, end);
+}
+
+.ns-ceo:is(:hover, :focus-visible) .ns-ceo__arrow-px {
+  translate: 0.34px -0.34px;
+  fill: var(--royal);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ns-ceo {
+    animation: ns-hero-rise 0.9s var(--ease-out) 0.35s backwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-ceo,
+  .ns-ceo__img,
+  .ns-ceo__avatar,
+  .ns-ceo__arrow-px {
+    transition: none;
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ns-ceo {
+    background: rgb(250 249 246 / 0.92);
   }
 }

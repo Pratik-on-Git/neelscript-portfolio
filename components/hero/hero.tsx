@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { GLYPHS_ID, WORDMARK_PATH } from "./wordmark-path";
 import { Wordmark } from "./wordmark";
 import { Menubar } from "./nav";
+import { CeoCard } from "./ceo-card";
 import { TrailCursor } from "./trail-cursor";
 import "./hero.css";
 
@@ -140,6 +141,7 @@ export function Hero() {
 
         {/* 4b · menubar */}
         <Menubar />
+        <CeoCard />
 
         {/* 5 · tagline */}
         <p className="ns-hero__text ns-hero__tagline" aria-hidden="true">
