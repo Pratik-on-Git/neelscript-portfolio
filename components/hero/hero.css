@@ -305,13 +305,28 @@
   fill: var(--royal);
 }
 
-/* "Neelscript" multiplayer cursor: label box 252 x 66 at (1155, 301) */
+/* "Neelscript" multiplayer cursor: label box 252 x 66 at (1155, 301).
+   Local coordinates below are design px relative to the label's top-left. */
 .ns-hero__presence {
+  --click-x: 126; /* where the cursor double-clicks: centre of "Neelscript" */
+  --click-y: 40;
+  --select: #005bff;
+
   position: absolute;
   inset-inline-start: calc(827 * var(--lu));
   inset-block-start: calc(11 * var(--lu));
   inline-size: calc(252 * var(--lu));
   block-size: calc(66 * var(--lu));
+  /* everything that scales as a group pivots on the cursor tip */
+  transform-origin: calc(-35.75 * var(--lu)) calc(116.5 * var(--lu));
+}
+
+/* the part that gets picked up and dragged */
+.ns-hero__drag {
+  position: absolute;
+  inset: 0;
+  transform-origin: calc(var(--click-x) * var(--lu))
+    calc(var(--click-y) * var(--lu));
 }
 
 .ns-hero__label {
@@ -331,7 +346,8 @@
   white-space: nowrap;
 }
 
-/* Arrow 46 x 54 at (1119.25, 363.5) → relative to the label box */
+/* Arrow 46 x 54 at (1119.25, 363.5) → relative to the label box.
+   Rotations and clicks pivot on the tip (bottom-left of its box). */
 .ns-hero__cursor {
   position: absolute;
   display: block;
@@ -341,6 +357,85 @@
   inline-size: calc(46 * var(--lu));
   block-size: calc(54 * var(--lu));
   fill: var(--royal);
+  transform-origin: 0 100%;
+}
+
+.ns-hero__cursor path {
+  /* white keyline, Figma-cursor style: only drawn while over the label */
+  stroke: #ffffff;
+  stroke-width: 0;
+  stroke-linejoin: round;
+  paint-order: stroke fill;
+}
+
+/* click ripples */
+.ns-hero__ripple {
+  position: absolute;
+  inset-inline-start: calc((var(--click-x) - 18) * var(--lu));
+  inset-block-start: calc((var(--click-y) - 18) * var(--lu));
+  inline-size: calc(36 * var(--lu));
+  block-size: calc(36 * var(--lu));
+  border: calc(2.5 * var(--lu)) solid rgb(255 255 255 / 0.95);
+  border-radius: 50%;
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Figma selection: outline, four corner handles, size badge */
+.ns-hero__selection {
+  position: absolute;
+  inset: calc(-5 * var(--lu));
+  border: calc(1.5 * var(--lu)) solid var(--select);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ns-hero__handle {
+  --hs: 10; /* handle size */
+  --ho: calc((var(--hs) / -2 - 0.75) * var(--lu)); /* centred on the line */
+
+  position: absolute;
+  inline-size: calc(var(--hs) * var(--lu));
+  block-size: calc(var(--hs) * var(--lu));
+  box-sizing: border-box;
+  background: #ffffff;
+  border: calc(1.5 * var(--lu)) solid var(--select);
+  scale: 0;
+}
+
+.ns-hero__handle--tl {
+  inset-block-start: var(--ho);
+  inset-inline-start: var(--ho);
+}
+.ns-hero__handle--tr {
+  inset-block-start: var(--ho);
+  inset-inline-end: var(--ho);
+}
+.ns-hero__handle--bl {
+  inset-block-end: var(--ho);
+  inset-inline-start: var(--ho);
+}
+.ns-hero__handle--br {
+  inset-block-end: var(--ho);
+  inset-inline-end: var(--ho);
+}
+
+.ns-hero__badge {
+  position: absolute;
+  inset-block-start: calc(100% + 9 * var(--lu));
+  inset-inline: 0;
+  inline-size: max-content;
+  margin-inline: auto;
+  padding: calc(4 * var(--lu)) calc(7 * var(--lu));
+  border-radius: calc(3 * var(--lu));
+  background: var(--select);
+  color: #ffffff;
+  font-size: max(15 * var(--lu), 9px); /* stays legible on phones */
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  opacity: 0;
 }
 
 /* Brand colours are content here; keep them under forced colours. */
@@ -379,8 +474,9 @@
   }
 
   .ns-hero__presence {
-    transform-origin: calc(-35.75 * var(--lu)) calc(116.5 * var(--lu));
-    animation: ns-hero-presence-in 1.1s var(--ease-out) 0.75s backwards;
+    animation:
+      ns-hero-presence-in 1.1s var(--ease-out) 0.75s backwards,
+      ns-hero-presence-loop var(--loop) linear var(--loop-delay) infinite;
   }
 
   .ns-hero__chip {
@@ -426,5 +522,364 @@
   }
   60% {
     opacity: 1;
+  }
+}
+
+/* ------------------------------------------- presence micro-story ------ */
+/*
+   One 12 s loop, shared by every moving part so they stay in lock-step.
+   Each part animates only the individual `translate` / `scale` / `rotate`
+   properties, which compose with (and never fight) the entrance `transform`.
+   0% and 100% are the untouched design frame.
+
+     0 –  6%   rest
+     6 – 10%   the arrow tilts (pivots on its tip)
+    10 – 16%   the tag springs up to 110%
+    18 – 28%   cursor + tag drift away together
+    31 – 38%   the cursor slides onto "Neelscript", turning into a genuine
+               pointer (white keyline fades in)
+    40 – 43%   double-click: two presses, two ripples
+    43 – 46%   selection: outline, corner handles pop, size badge
+    50 – 66%   press, lift, drag it back home along a curve
+    66 – 72%   drop: settle bounce, release, shrink back to 100%
+    74 – 78%   selection dismissed
+    78 – 88%   cursor returns home, turning back to the design arrow
+    92 –100%   rest
+*/
+
+.ns-hero__stage {
+  --loop: 12s;
+  --loop-delay: 2.4s;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ns-hero__cursor {
+    animation: ns-hero-cursor-loop var(--loop) linear var(--loop-delay)
+      infinite;
+  }
+
+  .ns-hero__cursor path {
+    animation: ns-hero-keyline-loop var(--loop) linear var(--loop-delay)
+      infinite;
+  }
+
+  .ns-hero__drag {
+    animation: ns-hero-drag-loop var(--loop) linear var(--loop-delay)
+      infinite;
+  }
+
+  .ns-hero__label {
+    animation: ns-hero-lift-loop var(--loop) linear var(--loop-delay)
+      infinite;
+  }
+
+  .ns-hero__ripple--a {
+    animation: ns-hero-ripple-a var(--loop) linear var(--loop-delay) infinite;
+  }
+
+  .ns-hero__ripple--b {
+    animation: ns-hero-ripple-b var(--loop) linear var(--loop-delay) infinite;
+  }
+
+  .ns-hero__selection {
+    animation: ns-hero-select-loop var(--loop) linear var(--loop-delay)
+      infinite;
+  }
+
+  .ns-hero__handle {
+    animation: ns-hero-handle-loop var(--loop) linear var(--loop-delay)
+      infinite;
+  }
+
+  .ns-hero__badge {
+    animation: ns-hero-badge-loop var(--loop) linear var(--loop-delay)
+      infinite;
+  }
+}
+
+/* whole tag (cursor + label): grow, drift away, get dragged home, shrink */
+@keyframes ns-hero-presence-loop {
+  0% {
+    translate: 0 0;
+    scale: 1;
+  }
+  10% {
+    scale: 1;
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  16% {
+    scale: 1.1;
+  }
+  18% {
+    translate: 0 0;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  28% {
+    translate: calc(56 * var(--lu)) calc(-34 * var(--lu));
+  }
+  52% {
+    translate: calc(56 * var(--lu)) calc(-34 * var(--lu));
+    animation-timing-function: cubic-bezier(0.5, 0, 0.7, 0.6);
+  }
+  59% {
+    translate: calc(30 * var(--lu)) calc(-5 * var(--lu));
+    animation-timing-function: cubic-bezier(0.25, 0.5, 0.2, 1);
+  }
+  66% {
+    translate: 0 0;
+    scale: 1.1;
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  72% {
+    scale: 1;
+  }
+  100% {
+    translate: 0 0;
+    scale: 1;
+  }
+}
+
+/* arrow: tilt, travel onto the label while turning into a genuine pointer
+   (the design arrow is a vertically mirrored cursor; scale 1 -1 about the
+   tip un-mirrors it, rotate 10deg stands its left edge upright), then
+   double-click, hold-press for the drag, and turn back on the way home */
+@keyframes ns-hero-cursor-loop {
+  0% {
+    translate: 0 0;
+    rotate: 0deg;
+    scale: 1 1;
+  }
+  6% {
+    rotate: 0deg;
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  10% {
+    rotate: -18deg;
+  }
+  31% {
+    translate: 0 0;
+    rotate: -18deg;
+    scale: 1 1;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  36% {
+    rotate: 10deg;
+    scale: 1 -1;
+  }
+  38% {
+    translate: calc(161.75 * var(--lu)) calc(-76.5 * var(--lu));
+  }
+  40% {
+    scale: 1 -1;
+  }
+  40.7% {
+    scale: 0.78 -0.78;
+  }
+  41.4% {
+    scale: 1 -1;
+  }
+  42.1% {
+    scale: 0.78 -0.78;
+  }
+  42.8% {
+    scale: 1 -1;
+  }
+  50% {
+    scale: 1 -1;
+  }
+  51.5% {
+    scale: 0.86 -0.86;
+  }
+  66.5% {
+    scale: 0.86 -0.86;
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  68.5% {
+    scale: 1 -1;
+  }
+  78% {
+    translate: calc(161.75 * var(--lu)) calc(-76.5 * var(--lu));
+    rotate: 10deg;
+    scale: 1 -1;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  86% {
+    rotate: 0deg;
+    scale: 1 1;
+  }
+  88% {
+    translate: 0 0;
+  }
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+    scale: 1 1;
+  }
+}
+
+@keyframes ns-hero-keyline-loop {
+  0%,
+  31% {
+    stroke-width: 0;
+  }
+  35%,
+  80% {
+    stroke-width: 3;
+  }
+  84%,
+  100% {
+    stroke-width: 0;
+  }
+}
+
+/* picked up: lift around the grab point, trail the motion, settle */
+@keyframes ns-hero-drag-loop {
+  0%,
+  50% {
+    scale: 1;
+    rotate: 0deg;
+  }
+  52.5% {
+    scale: 1.045;
+  }
+  55% {
+    rotate: -3deg;
+  }
+  61% {
+    rotate: 1.5deg;
+  }
+  66% {
+    scale: 1.045;
+    rotate: 0deg;
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  69% {
+    scale: 1;
+  }
+  100% {
+    scale: 1;
+    rotate: 0deg;
+  }
+}
+
+@keyframes ns-hero-lift-loop {
+  0%,
+  50% {
+    box-shadow: 0 0 0 0 rgb(0 35 110 / 0);
+  }
+  52.5%,
+  66% {
+    box-shadow: 0 calc(16 * var(--lu)) calc(26 * var(--lu))
+      calc(-8 * var(--lu)) rgb(0 35 110 / 0.35);
+  }
+  69%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(0 35 110 / 0);
+  }
+}
+
+@keyframes ns-hero-ripple-a {
+  0%,
+  40.6% {
+    opacity: 0;
+    scale: 0.2;
+  }
+  40.7% {
+    opacity: 1;
+    scale: 0.25;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  41.9% {
+    opacity: 0.85;
+    animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+  }
+  43.6% {
+    opacity: 0;
+    scale: 1.6;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+
+@keyframes ns-hero-ripple-b {
+  0%,
+  42% {
+    opacity: 0;
+    scale: 0.2;
+  }
+  42.1% {
+    opacity: 1;
+    scale: 0.25;
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  43.3% {
+    opacity: 0.85;
+    animation-timing-function: cubic-bezier(0.4, 0, 1, 1);
+  }
+  45% {
+    opacity: 0;
+    scale: 1.6;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.6;
+  }
+}
+
+@keyframes ns-hero-select-loop {
+  0%,
+  42.6% {
+    opacity: 0;
+  }
+  43.4%,
+  74% {
+    opacity: 1;
+  }
+  78%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes ns-hero-handle-loop {
+  0%,
+  42.6% {
+    scale: 0;
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  45% {
+    scale: 1;
+  }
+  74% {
+    scale: 1;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  77%,
+  100% {
+    scale: 0;
+  }
+}
+
+@keyframes ns-hero-badge-loop {
+  0%,
+  44% {
+    opacity: 0;
+    translate: 0 calc(-6 * var(--lu));
+    animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  46.5% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  74% {
+    opacity: 1;
+    translate: 0 0;
+  }
+  77%,
+  100% {
+    opacity: 0;
+    translate: 0 0;
   }
 }

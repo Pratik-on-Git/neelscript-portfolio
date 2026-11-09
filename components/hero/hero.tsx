@@ -149,7 +149,31 @@ export function Hero() {
             <use href={`#${GLYPHS_ID}`} />
           </svg>
 
+          {/*
+            Presence: a Figma-style multiplayer cursor. At rest it is the
+            exact design; the looping micro-story (tilt, grow, drift,
+            double-click, select, drag back, release) lives in hero.css.
+          */}
           <div className="ns-hero__presence">
+            {/* drag layer: everything that gets "picked up" */}
+            <div className="ns-hero__drag">
+              <div className="ns-hero__label">
+                <span className="ns-hero__label-text">Neelscript</span>
+              </div>
+
+              <span className="ns-hero__ripple ns-hero__ripple--a" />
+              <span className="ns-hero__ripple ns-hero__ripple--b" />
+
+              <div className="ns-hero__selection">
+                <span className="ns-hero__handle ns-hero__handle--tl" />
+                <span className="ns-hero__handle ns-hero__handle--tr" />
+                <span className="ns-hero__handle ns-hero__handle--bl" />
+                <span className="ns-hero__handle ns-hero__handle--br" />
+                <span className="ns-hero__badge">252 × 66</span>
+              </div>
+            </div>
+
+            {/* cursor rides above the label so it can click on it */}
             <svg
               className="ns-hero__cursor"
               viewBox="0 0 46 54"
@@ -157,9 +181,6 @@ export function Hero() {
             >
               <path d="M10.4 0 21.25 23.3 46 27 0 54Z" />
             </svg>
-            <div className="ns-hero__label">
-              <span className="ns-hero__label-text">Neelscript</span>
-            </div>
           </div>
         </div>
       </div>
