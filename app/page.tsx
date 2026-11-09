@@ -4,8 +4,10 @@ import { AboutIntro } from "@/components/scene/about-intro";
 
 export default function Home() {
   return (
-    // paper behind everything: the hero's diagonal cut reveals this
-    <main className="flex flex-1 flex-col bg-[#f2f0eb]">
+    // paper + grain behind everything: the hero dissolves into this
+    <main className="ns-page flex flex-1 flex-col bg-[#f2f0eb]">
+      {/* the hero's grain, carried across the page */}
+      <div className="ns-page-grain" aria-hidden="true" />
       <HeroScene>
         <Hero />
       </HeroScene>

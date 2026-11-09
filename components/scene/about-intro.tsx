@@ -44,22 +44,17 @@ function scramble(el: HTMLElement, text: string, duration = 0.7, delay = 0) {
 }
 
 /**
- * The section uncovered by the hero's diagonal exit, on the hero's paper.
- * An index bar (◆ (01) · (About Us) · © year) opens it; below, a full-bleed
+ * The section the hero dissolves into, on the hero's paper: a full-bleed
  * facts grid: four columns whose hairline dividers run the section's full
  * height, hairlines above and below the row reaching the screen edges, and
  * "+" marks where the outer columns cross them. Values type themselves in
  * as it enters and re-scramble on hover.
  */
 export function AboutIntro({
-  index = "01",
-  label = "About Us",
-  year = 2026,
+  label = "About us",
   facts = DEFAULT_FACTS,
 }: {
-  index?: string;
   label?: string;
-  year?: number;
   facts?: readonly Fact[];
 }) {
   const ref = useRef<HTMLElement>(null);
@@ -80,16 +75,6 @@ export function AboutIntro({
             scrollTrigger: { trigger: el, start: "top bottom", end: "top top", scrub: 0.6 },
           },
         );
-
-        // index bar
-        gsap
-          .timeline({ scrollTrigger: { trigger: ".ns-index", start: "top 88%", once: true } })
-          .from(".ns-index__rule", { scaleX: 0, duration: 1.2, ease: "expo.inOut" })
-          .from(
-            ".ns-index__cell > span",
-            { yPercent: 110, duration: 0.9, ease: "expo.out", stagger: 0.09 },
-            "-=0.55",
-          );
 
         // facts grid
         const values = gsap.utils.toArray<HTMLElement>(".ns-fact__value");
@@ -151,22 +136,9 @@ export function AboutIntro({
   return (
     <section ref={ref} id="about" className="ns-about" aria-labelledby="ns-about-label">
       <div className="ns-about__inner">
-        <div className="ns-index">
-          <span className="ns-index__rule" aria-hidden="true" />
-          <div className="ns-index__row">
-            <p className="ns-index__cell ns-index__cell--num">
-              <span>
-                <span className="ns-index__diamond" aria-hidden="true" />({index})
-              </span>
-            </p>
-            <h2 id="ns-about-label" className="ns-index__cell ns-index__cell--label">
-              <span>({label})</span>
-            </h2>
-            <p className="ns-index__cell ns-index__cell--year">
-              <span>© {year}</span>
-            </p>
-          </div>
-        </div>
+        <h2 id="ns-about-label" className="ns-hero__sr">
+          {label}
+        </h2>
 
         <div className="ns-facts">
           {/* column guides: run the section's full height */}
