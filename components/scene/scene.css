@@ -64,7 +64,7 @@
   overflow: hidden;
   pointer-events: none;
   mix-blend-mode: overlay;
-  opacity: 0.55;
+  opacity: 0.85; /* keep hero + page grain equal */
 }
 
 .ns-page-grain::before {

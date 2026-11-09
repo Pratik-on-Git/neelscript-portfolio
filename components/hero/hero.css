@@ -148,6 +148,11 @@
   --chips-gap: 36;
   --ck: 1; /* chip scale */
 
+  /* extra drop for each group, from the portrait's spare height (below) */
+  --o-tag: 0px;
+  --o-chips: 0px;
+  --o-foot: 0px;
+
   position: absolute;
   inset-inline-start: calc(50% - var(--cw) * var(--u) / 2);
   inset-block-start: calc(50% - var(--ch) * var(--u) / 2);
@@ -189,6 +194,37 @@
     --chips-w: 1080;
     --chips-gap: 18;
     --ck: 1.4167; /* 34 / 24 */
+
+    /* Tall screens (phones): the canvas is width-bound, which leaves spare
+       height (--slack). Rather than centring the stage in it, share it out
+       so the composition fills the screen: 6% to each outer margin, 26% to
+       each section gap, 18% to each gap inside the core group. Offsets are
+       relative to the centred stage, so the lockup itself stays put; the
+       header row takes the same 6% (header.css). */
+    --slack: max(0px, 100cqh - var(--ch) * var(--u));
+    --o-tag: calc(var(--slack) * -0.18);
+    --o-chips: calc(var(--slack) * 0.18);
+    --o-foot: calc(var(--slack) * 0.44);
+  }
+}
+
+/* Phones (portrait, narrow): same composition, type and pills sized up so
+   they read at arm's length (the header row matches in header.css).
+     margin 120 · brand + card row 120 · gap 48 · menu 120 ·
+     section gap 138.67 · tagline cap 50.4 · gap 56 · wordmark 331.6 ·
+     gap 56 · chips 274.06 · section gap 138.67 · footer cap 26.6 · margin 120 */
+@container hero (orientation: portrait) and (max-width: 599.98px) {
+  .ns-hero__stage {
+    --ly: 646.33; /* ink top lands on y 653.07 */
+
+    --tag-size: 72;
+    --tag-top: 546.67;
+    --foot-size: 38;
+    --foot-top: 1453.4;
+
+    --chips-y: 1040.67;
+    --chips-gap: 22;
+    --ck: 1.6;
   }
 }
 
@@ -240,7 +276,7 @@
   overflow: hidden;
   pointer-events: none;
   mix-blend-mode: overlay;
-  opacity: 0.55;
+  opacity: 0.85; /* keep hero + page grain equal */
 }
 
 .ns-hero__grain::before {
@@ -313,14 +349,19 @@
 .ns-hero__tagline {
   font-size: calc(var(--tag-size) * var(--u));
   inset-inline-start: calc((var(--tag-cx) - 600) * var(--u));
-  inset-block-start: calc(var(--tag-top) * var(--u) - var(--cap-offset-text));
+  inset-block-start: calc(
+    var(--tag-top) * var(--u) - var(--cap-offset-text) + var(--o-tag)
+  );
 }
 
 
 .ns-hero__footer {
-  font-size: calc(var(--foot-size) * var(--u));
+  /* never below 12px: small landscape phones would shrink it to ~10px */
+  font-size: max(12px, var(--foot-size) * var(--u));
   inset-inline-start: calc((var(--foot-cx) - 600) * var(--u));
-  inset-block-start: calc(var(--foot-top) * var(--u) - var(--cap-offset-text));
+  inset-block-start: calc(
+    var(--foot-top) * var(--u) - var(--cap-offset-text) + var(--o-foot)
+  );
 }
 
 .ns-hero__footer-sep {
@@ -376,7 +417,7 @@
   padding: 0;
   list-style: none;
   inset-inline-start: calc(var(--chips-x) * var(--u));
-  inset-block-start: calc(var(--chips-y) * var(--u));
+  inset-block-start: calc(var(--chips-y) * var(--u) + var(--o-chips));
   inline-size: calc(var(--chips-w) * var(--u));
 }
 
@@ -388,7 +429,10 @@
 }
 
 .ns-hero__chip {
-  --cu: calc(var(--ck) * var(--u));
+  /* Small landscape screens (tablets, phones on their side) get a floor so
+     the labels stay legible, capped by the width so the row still fits;
+     the row stays centred if it outgrows its box. */
+  --cu: max(var(--ck) * var(--u), min(0.55px, 100cqw / 1700));
 
   box-sizing: border-box;
   display: flex;
