@@ -126,12 +126,12 @@
   --gy: 0;
 
   /* menubar */
-  --nav-x: 570;
+  --nav-x: 520;
   --nav-y: 44;
-  --nav-w: 780;
-  --nav-h: 72;
-  --nav-fs: 19;
-  --nav-num: 12.5;
+  --nav-w: 880;
+  --nav-h: 76;
+  --nav-fs: 24;
+  --nav-num: 15;
   --nav-pad: 32;
 
   /* type */
@@ -176,8 +176,8 @@
     --nav-y: 250;
     --nav-w: 1000;
     --nav-h: 90;
-    --nav-fs: 34;
-    --nav-num: 22;
+    --nav-fs: 40;
+    --nav-num: 26;
     --nav-pad: 0;
 
     --tag-size: 60;
@@ -1086,7 +1086,7 @@
   position: relative;
   inset-block-start: calc(-0.28 * var(--nav-fs) * var(--nu));
   margin-inline-start: calc(0.6 * var(--nav-fs) * var(--nu));
-  color: rgb(0 0 0 / 0.42);
+  color: rgb(0 0 0 / 0.5);
   font-size: calc(var(--nav-num) * var(--nu));
   font-weight: 500;
   letter-spacing: 0.02em;
