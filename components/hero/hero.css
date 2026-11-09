@@ -126,7 +126,11 @@
   --gy: 0;
 
   /* menubar */
-  --nav-y: 40;
+  /* vertical rhythm (the wordmark, ink 299 → 723.5, is the anchor):
+       outer margin 62 · menu 66 · gap 68.7 · tagline cap 34 · gap 68.7 ·
+       wordmark · gap 68.7 · chips 47.9 · … · footer · outer margin 62
+     68.7 is one cell of the background grid. */
+  --nav-y: 61.6;
   --nav-col: 150; /* each item's segment */
   --nav-h: 66;
   --nav-inset: 6; /* glass padding around the segments */
@@ -134,15 +138,15 @@
 
   /* type */
   --tag-size: 48;
-  --tag-top: 179;
+  --tag-top: 196.3; /* cap box ends one gap above the wordmark */
   --tag-cx: 960.1;
   --foot-size: 24;
-  --foot-top: 963;
+  --foot-top: 1001.4; /* cap box ends one outer margin from the bottom */
   --foot-cx: 960;
 
   /* services */
   --chips-x: 482;
-  --chips-y: 784.82;
+  --chips-y: 792.2; /* one gap below the wordmark */
   --chips-w: 957;
   --chips-gap: 36;
   --ck: 1; /* chip scale */
@@ -165,11 +169,14 @@
 
     --lk: 0.78;
     --lx: 47.04; /* 540 - 632 * 0.78 → wordmark centred */
-    --ly: 495.26; /* ink top lands on y 502 */
+    --ly: 497.26; /* ink top lands on y 504 */
 
     --gx: -7.8; /* desktop grid, re-centred: (-420) mod 68.7 */
     --gy: -14.8; /* (+260) mod 68.7 */
 
+    /* same rhythm on the portrait canvas: outer margin 250 · menu 100 ·
+       gap 56 · tagline cap 42 · gap 56 · wordmark · gap 56 · chips ·
+       … · footer · outer margin 250 */
     --nav-y: 250;
     --nav-col: 246;
     --nav-h: 100;
@@ -177,14 +184,14 @@
     --nav-fs: 34;
 
     --tag-size: 60;
-    --tag-top: 400;
+    --tag-top: 406;
     --tag-cx: 540;
     --foot-size: 32;
-    --foot-top: 1480;
+    --foot-top: 1327.6;
     --foot-cx: 540;
 
     --chips-x: 0;
-    --chips-y: 904;
+    --chips-y: 891.6;
     --chips-w: 1080;
     --chips-gap: 18;
     --ck: 1.4167; /* 34 / 24 */

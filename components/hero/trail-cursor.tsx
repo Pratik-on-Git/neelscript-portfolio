@@ -110,14 +110,14 @@ const ANCHORS: readonly { i: number; tip: Pt; angle: number }[] = [
 ];
 
 /** where the pointer may roam (design px) */
-const BOUNDS = { x0: 70, x1: 1850, y0: 150, y1: 1000 };
+const BOUNDS = { x0: 70, x1: 1850, y0: 150, y1: 975 };
 /** keep-out boxes for free waypoints: tagline, menu, tag, chips, footer */
 const KEEP_OUT = [
-  [640, 160, 1280, 232],
-  [560, 30, 1360, 130],
+  [640, 186, 1280, 250],
+  [640, 50, 1290, 140],
   [1060, 200, 1520, 430],
-  [470, 775, 1450, 845],
-  [840, 950, 1080, 995],
+  [470, 782, 1450, 852],
+  [840, 990, 1080, 1030],
 ] as const;
 
 /* --- the design's rest pose and trail --------------------------------- */
