@@ -1,5 +1,6 @@
 import type { CSSProperties } from "react";
 import { WORDMARK_PATH } from "./wordmark-path";
+import { Wordmark } from "./wordmark";
 import "./hero.css";
 
 /**
@@ -77,7 +78,7 @@ export function Hero() {
         Neelscript, your friendly neighbourhood developer
       </h1>
 
-      {/* Shared glyph geometry: defined once, drawn twice (echo + wordmark). */}
+      {/* Glyph geometry + blur for the background echo. */}
       <svg className="ns-hero__defs" aria-hidden="true" focusable="false">
         <defs>
           <path id={GLYPHS_ID} d={WORDMARK_PATH} fillRule="evenodd" />
@@ -141,13 +142,8 @@ export function Hero() {
 
         {/* 6 · lockup: wordmark + "Neelscript" multiplayer cursor */}
         <div className="ns-hero__lockup" aria-hidden="true">
-          <svg
-            className="ns-hero__wordmark"
-            viewBox="-8 290 1280 442"
-            focusable="false"
-          >
-            <use href={`#${GLYPHS_ID}`} />
-          </svg>
+          {/* interactive per-letter wordmark (client, GSAP) */}
+          <Wordmark />
 
           {/*
             Presence: a Figma-style multiplayer cursor. At rest it is the

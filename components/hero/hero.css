@@ -179,6 +179,8 @@
   block-size: calc(2184.412 * var(--lk) * var(--u));
   fill: var(--echo);
   pointer-events: none;
+  /* pointer parallax (set by the wordmark's GSAP loop, design px) */
+  translate: calc(var(--ex, 0) * var(--u)) calc(var(--ey, 0) * var(--u));
 }
 
 /* -------------------------------------------------------- 2 · grid ------ */
@@ -303,6 +305,13 @@
   inline-size: calc(1280 * var(--lu));
   block-size: calc(442 * var(--lu));
   fill: var(--royal);
+}
+
+/* letters are interactive: hover wobbles, click jumps */
+.ns-hero__glyph {
+  pointer-events: visiblePainted;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* "Neelscript" multiplayer cursor: label box 252 x 66 at (1155, 301).
@@ -468,9 +477,10 @@
     animation: ns-hero-rise 1s var(--ease-out) 0.1s backwards;
   }
 
-  .ns-hero__wordmark {
-    transform-origin: 50% 70%;
-    animation: ns-hero-wordmark-in 1.15s var(--ease-out) 0.2s backwards;
+  /* GSAP inflates the letters once hydrated (it sets [data-live]).
+     Until then they stay hidden; if JS never arrives they fade in anyway. */
+  .ns-hero__wordmark:not([data-live]) {
+    animation: ns-hero-fade-in 0.8s ease-out 1.6s backwards;
   }
 
   .ns-hero__presence {
@@ -508,12 +518,6 @@
   }
 }
 
-@keyframes ns-hero-wordmark-in {
-  from {
-    opacity: 0;
-    transform: translateY(calc(48 * var(--lu))) scale(0.96);
-  }
-}
 
 @keyframes ns-hero-presence-in {
   from {
