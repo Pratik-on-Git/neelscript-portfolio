@@ -590,6 +590,9 @@ export function TrailCursor() {
             );
           });
 
+        const wait = (sec: number) =>
+          new Promise<void>((done) => keep(gsap.delayedCall(sec, done)));
+
         /* --- taps ----------------------------------------------------------
            Resolves just after the press lands, so the next leg can begin
            while the pointer is still springing back: no parking. */
@@ -699,6 +702,9 @@ export function TrailCursor() {
             atLetter = a.i;
             await tap(a.i);
             if (!alive) return;
+            // let the click land: rest on the letter while it jumps, then go
+            await wait(rand(1.5, 2.3));
+            if (!alive) return;
           }
         };
 
@@ -796,7 +802,9 @@ export function TrailCursor() {
               .to(press, { s: 0.88, duration: 0.09, ease: "power2.out" })
               .to(press, { s: 1, duration: 0.7, ease: "elastic.out(1, 0.4)" })
               .add(() => {
-                void tap(0).then(() => tour());
+                void tap(0)
+                  .then(() => wait(rand(1.5, 2.3)))
+                  .then(() => tour());
               }, "-=0.35"),
           );
         }
