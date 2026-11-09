@@ -1,15 +1,16 @@
 import type { CSSProperties } from "react";
 
 /**
- * Menubar: four numbered links, set straight on the hero's paper.
+ * Menubar: four links in a frosted-glass bar, with a glass tab
+ * that rests on the current page and glides to whichever item is hovered.
  * Pure markup + CSS (hero.css, "menubar" section); no client JS.
  */
 
 const ITEMS = [
-  { label: "Home", href: "#top", n: "01" },
-  { label: "Portfolio", href: "#portfolio", n: "02" },
-  { label: "About", href: "#about", n: "03" },
-  { label: "Contact", href: "#contact", n: "04" },
+  { label: "Home", href: "#top" },
+  { label: "Portfolio", href: "#portfolio" },
+  { label: "About", href: "#about" },
+  { label: "Contact", href: "#contact" },
 ] as const;
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>;
@@ -17,8 +18,10 @@ type Vars = CSSProperties & Record<`--${string}`, string | number>;
 export function Menubar({ current = "Home" }: { current?: string }) {
   return (
     <nav className="ns-nav" aria-label="Primary">
+      {/* glass tab: rests on the current page, glides to the hovered item */}
+      <span className="ns-nav__tab" aria-hidden="true" />
       <ul className="ns-nav__list">
-        {ITEMS.map(({ label, href, n }, i) => (
+        {ITEMS.map(({ label, href }, i) => (
           <li key={label} className="ns-nav__item" style={{ "--i": i } as Vars}>
             <a
               className="ns-nav__link"
@@ -40,9 +43,6 @@ export function Menubar({ current = "Home" }: { current?: string }) {
                 </span>
                 <span className="ns-hero__sr">{label}</span>
               </span>
-              <sup className="ns-nav__num" aria-hidden="true">
-                {n}
-              </sup>
             </a>
           </li>
         ))}
