@@ -20,12 +20,17 @@
 
 .ns-scene[data-live] .ns-scene__clip {
   --lift: calc(var(--p) * 2vw); /* the fade's end rises a little */
-  --fade: calc(var(--p) * 42vh + 1px); /* and its soft band widens */
+  /* the soft band grows quickly to ~62% of the screen height */
+  --fade: calc(min(1, var(--p) * 2.5) * 62vh + 1px);
   --tilt: calc(var(--p) * 5deg); /* and tilts, right side higher */
+  /* eased stops: a long, gentle dissolve with no visible edge */
   --fade-mask: linear-gradient(
     calc(180deg - var(--tilt)),
     #000 calc(100% - var(--lift) - var(--fade)),
-    rgb(0 0 0 / 0.55) calc(100% - var(--lift) - var(--fade) * 0.45),
+    rgb(0 0 0 / 0.86) calc(100% - var(--lift) - var(--fade) * 0.8),
+    rgb(0 0 0 / 0.62) calc(100% - var(--lift) - var(--fade) * 0.6),
+    rgb(0 0 0 / 0.36) calc(100% - var(--lift) - var(--fade) * 0.4),
+    rgb(0 0 0 / 0.14) calc(100% - var(--lift) - var(--fade) * 0.2),
     transparent calc(100% - var(--lift))
   );
 
