@@ -118,18 +118,22 @@
 
   /* lockup: wordmark frame origin (glyph x 0, glyph y 290) and scale */
   --lx: 328;
-  --ly: 290;
+  --ly: 375.6; /* the design's 290, moved down 85.6 to centre the content */
   --lk: 1;
 
   /* grid phase shift */
   --gx: 0;
   --gy: 0;
 
+  /* Vertical hierarchy (design px, 1080 tall):
+       top margin 61.6 · menu 66 · header gap 154.3 ·
+       [ tagline cap 34 · gap 68.7 · wordmark 424.5 · gap 68.7 · chips 47.9 ]
+       · bottom margin 154.3
+     The content block sits centred under the menu; its inner gaps are one
+     background-grid cell (68.7); the header gap and bottom margin match. */
+  --shift-y: 85.6; /* how far the wordmark group moved from the design */
+
   /* menubar */
-  /* vertical rhythm (the wordmark, ink 299 → 723.5, is the anchor):
-       outer margin 62 · menu 66 · gap 68.7 · tagline cap 34 · gap 68.7 ·
-       wordmark · gap 68.7 · chips 47.9 · … · footer · outer margin 62
-     68.7 is one cell of the background grid. */
   --nav-y: 61.6;
   --nav-col: 150; /* each item's segment */
   --nav-h: 66;
@@ -138,15 +142,12 @@
 
   /* type */
   --tag-size: 48;
-  --tag-top: 196.3; /* cap box ends one gap above the wordmark */
+  --tag-top: 281.9; /* menu bottom 127.6 + header gap 154.3 */
   --tag-cx: 960.1;
-  --foot-size: 24;
-  --foot-top: 1001.4; /* cap box ends one outer margin from the bottom */
-  --foot-cx: 960;
 
   /* services */
   --chips-x: 482;
-  --chips-y: 792.2; /* one gap below the wordmark */
+  --chips-y: 877.8; /* wordmark ink bottom 809.1 + gap 68.7 */
   --chips-w: 957;
   --chips-gap: 36;
   --ck: 1; /* chip scale */
@@ -169,29 +170,27 @@
 
     --lk: 0.78;
     --lx: 47.04; /* 540 - 632 * 0.78 → wordmark centred */
-    --ly: 497.26; /* ink top lands on y 504 */
+    --ly: 634.66; /* ink top lands on y 641.4 */
 
     --gx: -7.8; /* desktop grid, re-centred: (-420) mod 68.7 */
     --gy: -14.8; /* (+260) mod 68.7 */
 
-    /* same rhythm on the portrait canvas: outer margin 250 · menu 100 ·
-       gap 56 · tagline cap 42 · gap 56 · wordmark · gap 56 · chips ·
-       … · footer · outer margin 250 */
-    --nav-y: 250;
+    /* Portrait hierarchy (1600 tall), the whole composition centred:
+         margin 331.4 · menu 100 · header gap 112 · tagline cap 42 · gap 56 ·
+         wordmark 331.6 · gap 56 · chips 239.7 · margin 331.3 */
+    --shift-y: 0;
+    --nav-y: 331.4;
     --nav-col: 246;
     --nav-h: 100;
     --nav-inset: 8;
     --nav-fs: 34;
 
     --tag-size: 60;
-    --tag-top: 406;
+    --tag-top: 543.4;
     --tag-cx: 540;
-    --foot-size: 32;
-    --foot-top: 1327.6;
-    --foot-cx: 540;
 
     --chips-x: 0;
-    --chips-y: 891.6;
+    --chips-y: 1029;
     --chips-w: 1080;
     --chips-gap: 18;
     --ck: 1.4167; /* 34 / 24 */
@@ -322,11 +321,6 @@
   inset-block-start: calc(var(--tag-top) * var(--u) - var(--cap-offset-text));
 }
 
-.ns-hero__footer {
-  font-size: calc(var(--foot-size) * var(--u));
-  inset-inline-start: calc((var(--foot-cx) - 600) * var(--u));
-  inset-block-start: calc(var(--foot-top) * var(--u) - var(--cap-offset-text));
-}
 
 /* ------------------------------------------------------ services -------- */
 
@@ -604,10 +598,6 @@
 
   .ns-hero__chip {
     animation: ns-hero-rise 0.9s var(--ease-out) calc(0.55s + var(--i) * 0.08s) backwards;
-  }
-
-  .ns-hero__footer {
-    animation: ns-hero-fade-in 1s ease-out 0.9s backwards;
   }
 }
 
@@ -1177,7 +1167,8 @@
   display: block;
   overflow: visible;
   inset-inline-start: calc(-1700 * var(--u));
-  inset-block-start: 0;
+  /* drawn in the design's coordinates; moves with the wordmark group */
+  inset-block-start: calc(var(--shift-y, 0) * var(--u));
   inline-size: calc(3700 * var(--u));
   block-size: calc(1080 * var(--u));
   pointer-events: none;

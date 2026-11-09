@@ -125,11 +125,6 @@ export function Hero() {
             text); the pointer itself is lifted above everything (z-index) */}
         <TrailCursor />
 
-        {/* 3 · footer line (sits under the echo layer in the design stack) */}
-        <p className="ns-hero__text ns-hero__footer">
-          Designs &amp; Dev | 2026
-        </p>
-
         {/* 4 · services */}
         <ul className="ns-hero__services" aria-label="Services">
           {SERVICES.map(({ label, width, dx }, i) => (

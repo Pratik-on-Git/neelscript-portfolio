@@ -110,14 +110,15 @@ const ANCHORS: readonly { i: number; tip: Pt; angle: number }[] = [
 ];
 
 /** where the pointer may roam (design px) */
-const BOUNDS = { x0: 70, x1: 1850, y0: 150, y1: 975 };
-/** keep-out boxes for free waypoints: tagline, menu, tag, chips, footer */
+// (this layer is drawn in the design's coordinates and shifted down with
+//  the wordmark group, so the menu sits above y 42 here)
+const BOUNDS = { x0: 70, x1: 1850, y0: 120, y1: 945 };
+/** keep-out boxes for free waypoints: tagline, menu, tag, chips */
 const KEEP_OUT = [
   [640, 186, 1280, 250],
-  [640, 50, 1290, 140],
+  [640, -40, 1290, 60],
   [1060, 200, 1520, 430],
   [470, 782, 1450, 852],
-  [840, 990, 1080, 1030],
 ] as const;
 
 /* --- the design's rest pose and trail --------------------------------- */
