@@ -1,0 +1,164 @@
+/* =============================================================================
+   Smart sticky header.
+
+   The frame re-creates the hero's scale (--u) and stage offset from the
+   viewport, so at the top of the page the brand, menu and Contact button
+   sit exactly where the hero design puts them. States (set by
+   site-header.tsx on .ns-header):
+     (none)          at the top: resting in the hero layout
+     [data-float]    scrolled: docked a few px from the top, over a blur
+     [data-hidden]   scrolling down: slid out of view
+   ========================================================================== */
+
+.ns-header {
+  position: fixed;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 50;
+  block-size: 0;
+  container: ns-header / inline-size;
+  pointer-events: none;
+}
+
+.ns-header__frame {
+  /* the hero's palette and easing (header items share its styles) */
+  --paper: #f2f0eb;
+  --ink: #000000;
+  --royal: #005bff;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* the hero's canvas and scale, from the viewport */
+  --cw: 1920;
+  --ch: 1080;
+  --hh: max(100svh, min(56.25cqw, 600px)); /* the hero's height */
+  --u: min(100cqw / 1920, var(--hh) / 1080);
+  --stage-top: calc(var(--hh) / 2 - var(--ch) * var(--u) / 2);
+
+  /* row layout (design px), centred on the hero's header line */
+  --nav-y: 61.6;
+  --nav-col: 150; /* each menu item's segment */
+  --nav-h: 66;
+  --nav-inset: 6; /* glass padding around the segments */
+  --nav-fs: 22;
+  --brand-y: 61.6;
+  --brand-h: 66;
+  --brand-fs: 28;
+  --card-w: 268; /* | LK | Contact ……… ↗ | */
+  --card-h: 66;
+  --card-y: 61.6;
+  --card-gap: 14;
+  --card-title: 19;
+
+  /* where the row starts / ends on screen at rest, and where it docks */
+  --row-top: calc(var(--stage-top) + var(--card-y) * var(--u));
+  --row-bottom: calc(var(--stage-top) + (var(--nav-y) + var(--nav-h)) * var(--u));
+  --dock: clamp(10px, calc(var(--gutter) * 0.42), 26px);
+
+  position: relative;
+  inline-size: 100%;
+  block-size: 0;
+  color: var(--ink);
+  font-family: var(--font-space-grotesk), "Space Grotesk", ui-sans-serif,
+    system-ui, sans-serif;
+  font-weight: 400;
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (orientation: portrait) {
+  .ns-header__frame {
+    --cw: 1080;
+    --ch: 1600;
+    --hh: max(100svh, min(100cqw * 1600 / 1080, 600px));
+    --u: min(100cqw / 1080, var(--hh) / 1600);
+
+    /* brand + card share the first row; the menu spans the second */
+    --card-w: 400;
+    --card-h: 100;
+    --card-y: 186.15;
+    --brand-y: 186.15;
+    --brand-h: 100;
+    --brand-fs: 40;
+    --card-gap: 20;
+    --card-title: 30;
+    --nav-y: 342.15;
+    --nav-col: 325; /* 3 * 325 + 16 = 991, gutter to gutter */
+    --nav-h: 100;
+    --nav-inset: 8;
+    --nav-fs: 34;
+  }
+}
+
+/* --- the row ------------------------------------------------------------ */
+
+.ns-header__row {
+  --shift: 0px;
+
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: var(--row-bottom);
+  translate: 0 var(--shift);
+  transition: translate 0.65s cubic-bezier(0.2, 0.85, 0.2, 1);
+}
+
+.ns-header__row > * {
+  pointer-events: auto;
+}
+
+/* docked: the row's top sits --dock from the viewport top */
+.ns-header[data-float] .ns-header__row {
+  --shift: calc(var(--dock) - var(--row-top));
+}
+
+/* hidden: slid fully above the viewport */
+.ns-header[data-hidden] .ns-header__row {
+  --shift: calc(-1 * var(--row-bottom) - 48px);
+  transition-timing-function: cubic-bezier(0.55, 0, 0.75, 0.3);
+  transition-duration: 0.45s;
+}
+
+/* --- progressive blur behind the docked row ------------------------------ */
+
+.ns-header__veil {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: calc(var(--dock) + var(--row-bottom) - var(--row-top) + 36px);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  background: linear-gradient(
+    180deg,
+    rgb(242 240 235 / 0.7) 0%,
+    rgb(242 240 235 / 0) 100%
+  );
+  -webkit-mask-image: linear-gradient(180deg, #000 45%, transparent 100%);
+  mask-image: linear-gradient(180deg, #000 45%, transparent 100%);
+  opacity: 0;
+  translate: 0 -100%;
+  transition:
+    opacity 0.5s ease,
+    translate 0.65s cubic-bezier(0.2, 0.85, 0.2, 1);
+}
+
+.ns-header[data-float]:not([data-hidden]) .ns-header__veil {
+  opacity: 1;
+  translate: 0 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-header__row,
+  .ns-header__veil {
+    transition: none;
+  }
+}
+
+@media print {
+  .ns-header {
+    position: absolute;
+  }
+  .ns-header__veil {
+    display: none;
+  }
+}

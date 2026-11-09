@@ -131,24 +131,7 @@
      background-grid cell (68.7); section gaps match above and below. */
   --shift-y: 46.3; /* how far the wordmark group moved from the design */
 
-  /* menubar */
-  --nav-y: 61.6;
-  --nav-col: 150; /* each item's segment */
-  --nav-h: 66;
-  --nav-inset: 6; /* glass padding around the segments */
-  --nav-fs: 22;
-
-  /* brand: same line as the menubar, left edge on the site gutter */
-  --brand-y: 61.6; /* = --nav-y */
-  --brand-h: 66; /* = --nav-h */
-  --brand-fs: 28;
-
-  /* ceo card: same line as the menubar, right edge on the site gutter */
-  --card-w: 268; /* | LK | Contact ……… ↗ | */
-  --card-h: 66; /* = --nav-h */
-  --card-y: 61.6; /* = --nav-y */
-  --card-gap: 14;
-  --card-title: 19;
+  /* header row vars (nav, brand, card) live on .ns-header__frame */
 
   /* type */
   --tag-size: 48;
@@ -193,20 +176,6 @@
          section gap 112 · tagline cap 42 · gap 56 · wordmark 331.6 · gap 56 ·
          chips 239.7 · section gap 112 · footer cap 22.4 · margin 186.15 */
     --shift-y: 0;
-    --card-w: 400;
-    --card-h: 100;
-    --card-x: 240;
-    --card-y: 186.15;
-    --brand-y: 186.15; /* shares the card's row */
-    --brand-h: 100;
-    --brand-fs: 40;
-    --card-gap: 20;
-    --card-title: 30;
-    --nav-y: 342.15;
-    --nav-col: 325; /* menu spans the gutters: 3 * 325 + 16 = 991 */
-    --nav-h: 100;
-    --nav-inset: 8;
-    --nav-fs: 34;
 
     --tag-size: 60;
     --tag-top: 554.15;
@@ -1080,9 +1049,9 @@
 
   position: absolute;
   inset-inline-start: calc(
-    (var(--cw) / 2 - var(--nav-w) / 2 + var(--nav-dx, 0)) * var(--nu)
+    50% + (var(--nav-dx, 0) - var(--nav-w) / 2) * var(--nu)
   );
-  inset-block-start: calc(var(--nav-y) * var(--nu));
+  inset-block-start: calc(var(--stage-top) + var(--nav-y) * var(--nu));
   inline-size: calc(var(--nav-w) * var(--nu));
   block-size: calc(var(--nav-h) * var(--nu));
   box-sizing: border-box;
@@ -1334,10 +1303,9 @@
   --cu: var(--u);
 
   position: absolute;
-  /* right edge on the site gutter, measured from the hero's (viewport's)
-     right edge, not the scaled stage */
-  inset-inline-end: calc(var(--cw) * var(--u) / 2 - 50cqw + var(--gutter));
-  inset-block-start: calc(var(--card-y) * var(--cu));
+  /* right edge on the site gutter */
+  inset-inline-end: var(--gutter);
+  inset-block-start: calc(var(--stage-top) + var(--card-y) * var(--cu));
   inline-size: calc(var(--card-w) * var(--cu));
   block-size: calc(var(--card-h) * var(--cu));
   box-sizing: border-box;
@@ -1517,8 +1485,8 @@
 */
 .ns-brand {
   position: absolute;
-  inset-inline-start: calc(var(--cw) * var(--u) / 2 - 50cqw + var(--gutter));
-  inset-block-start: calc(var(--brand-y) * var(--u));
+  inset-inline-start: var(--gutter);
+  inset-block-start: calc(var(--stage-top) + var(--brand-y) * var(--u));
   block-size: calc(var(--brand-h) * var(--u));
   display: flex;
   align-items: center;

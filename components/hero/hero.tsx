@@ -1,8 +1,6 @@
 import type { CSSProperties } from "react";
 import { GLYPHS_ID, WORDMARK_PATH } from "./wordmark-path";
 import { Wordmark } from "./wordmark";
-import { Menubar } from "./nav";
-import { CeoCard } from "./ceo-card";
 import { TrailCursor } from "./trail-cursor";
 import "./hero.css";
 
@@ -156,23 +154,8 @@ export function Hero() {
           ))}
         </ul>
 
-        {/* 4b · menubar */}
-        {/* brand, on the menubar's line at the left gutter */}
-        <a className="ns-brand" href="#top" aria-label="NeelScript, home">
-          <span className="ns-brand__mark" aria-hidden="true" />
-          <span className="ns-nav__label" aria-hidden="true">
-            <span className="ns-nav__roll">
-              {Array.from("NeelScript").map((ch, c) => (
-                <span key={c} className="ns-nav__ch" style={{ "--c": c } as Vars}>
-                  {ch}
-                </span>
-              ))}
-            </span>
-          </span>
-        </a>
-        <Menubar />
-        {/* one action on the right: CEO card + Contact pill */}
-        <CeoCard />
+        {/* 4b · the header row (brand, menu, Contact) lives in the fixed
+            site header (components/header), laid out to sit right here */}
 
         {/* 5 · tagline */}
         <p className="ns-hero__text ns-hero__tagline" aria-hidden="true">
