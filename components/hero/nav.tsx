@@ -1,7 +1,7 @@
 import type { CSSProperties } from "react";
 
 /**
- * Menubar: four links in a frosted-glass bar, with a glass tab
+ * Menubar: three links in a frosted-glass bar, with a glass tab
  * that rests on the current page and glides to whichever item is hovered.
  * Pure markup + CSS (hero.css, "menubar" section); no client JS.
  */
@@ -10,7 +10,6 @@ const ITEMS = [
   { label: "Home", href: "#top" },
   { label: "Portfolio", href: "#portfolio" },
   { label: "About", href: "#about" },
-  { label: "Contact", href: "#contact" },
 ] as const;
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>;

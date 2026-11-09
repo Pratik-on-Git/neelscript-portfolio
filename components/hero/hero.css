@@ -118,20 +118,20 @@
 
   /* lockup: wordmark frame origin (glyph x 0, glyph y 290) and scale */
   --lx: 328;
-  --ly: 375.6; /* the design's 290, moved down 85.6 to centre the content */
+  --ly: 336.3; /* the design's 290, moved down 46.3 (see hierarchy below) */
   --lk: 1;
 
   /* grid phase shift */
   --gx: 0;
   --gy: 0;
 
-  /* Vertical hierarchy (design px, 1080 tall):
-       top margin 61.6 · menu 66 · header gap 154.3 ·
+  /* Vertical hierarchy (design px, 1080 tall), symmetric top to bottom:
+       margin 61.6 · header row 66 · section gap 115 ·
        [ tagline cap 34 · gap 68.7 · wordmark 424.5 · gap 68.7 · chips 47.9 ]
-       · bottom margin 154.3
-     The content block sits centred under the menu; its inner gaps are one
-     background-grid cell (68.7); the header gap and bottom margin match. */
-  --shift-y: 85.6; /* how far the wordmark group moved from the design */
+       · section gap 115 · footer cap 17 · margin 61.6
+     Outer margins = the site gutter at 1920; content gaps are one
+     background-grid cell (68.7); section gaps match above and below. */
+  --shift-y: 46.3; /* how far the wordmark group moved from the design */
 
   /* menubar */
   --nav-y: 61.6;
@@ -140,22 +140,29 @@
   --nav-inset: 6; /* glass padding around the segments */
   --nav-fs: 22;
 
-  /* ceo card: same line as the menubar, right edge on the 62 outer margin */
-  --card-w: 304;
+  /* brand: same line as the menubar, left edge on the site gutter */
+  --brand-y: 61.6; /* = --nav-y */
+  --brand-h: 66; /* = --nav-h */
+  --brand-fs: 28;
+
+  /* ceo card: same line as the menubar, right edge on the site gutter */
+  --card-w: 268; /* | LK | Contact ……… ↗ | */
   --card-h: 66; /* = --nav-h */
-  --card-x: 1554.4; /* 1920 - 61.6 - 304 */
   --card-y: 61.6; /* = --nav-y */
   --card-gap: 14;
   --card-title: 19;
 
   /* type */
   --tag-size: 48;
-  --tag-top: 281.9; /* menu bottom 127.6 + header gap 154.3 */
+  --tag-top: 242.6; /* header row bottom 127.6 + section gap 115 */
   --tag-cx: 960.1;
+  --foot-size: 24;
+  --foot-top: 1001.4; /* cap box ends one outer margin from the bottom */
+  --foot-cx: 960;
 
   /* services */
   --chips-x: 482;
-  --chips-y: 877.8; /* wordmark ink bottom 809.1 + gap 68.7 */
+  --chips-y: 838.5; /* wordmark ink bottom 769.8 + gap 68.7 */
   --chips-w: 957;
   --chips-gap: 36;
   --ck: 1; /* chip scale */
@@ -178,34 +185,40 @@
 
     --lk: 0.78;
     --lx: 47.04; /* 540 - 632 * 0.78 → wordmark centred */
-    --ly: 712.66; /* ink top lands on y 719.4 */
+    --ly: 645.41; /* ink top lands on y 652.15 */
 
     --gx: -7.8; /* desktop grid, re-centred: (-420) mod 68.7 */
     --gy: -14.8; /* (+260) mod 68.7 */
 
-    /* Portrait hierarchy (1600 tall), the whole composition centred:
-         margin 253.4 · card 100 · gap 56 · menu 100 · header gap 112 ·
-         tagline cap 42 · gap 56 · wordmark 331.6 · gap 56 · chips 239.7 ·
-         margin 253.3 */
+    /* Portrait hierarchy (1600 tall), symmetric, the whole thing centred:
+         margin 186.15 · brand + card row 100 · gap 56 · menu 100 ·
+         section gap 112 · tagline cap 42 · gap 56 · wordmark 331.6 · gap 56 ·
+         chips 239.7 · section gap 112 · footer cap 22.4 · margin 186.15 */
     --shift-y: 0;
-    --card-w: 600;
+    --card-w: 400;
     --card-h: 100;
     --card-x: 240;
-    --card-y: 253.4;
+    --card-y: 186.15;
+    --brand-y: 186.15; /* shares the card's row */
+    --brand-h: 100;
+    --brand-fs: 40;
     --card-gap: 20;
     --card-title: 30;
-    --nav-y: 409.4;
-    --nav-col: 246;
+    --nav-y: 342.15;
+    --nav-col: 325; /* menu spans the gutters: 3 * 325 + 16 = 991 */
     --nav-h: 100;
     --nav-inset: 8;
     --nav-fs: 34;
 
     --tag-size: 60;
-    --tag-top: 621.4;
+    --tag-top: 554.15;
     --tag-cx: 540;
+    --foot-size: 32;
+    --foot-top: 1391.45;
+    --foot-cx: 540;
 
     --chips-x: 0;
-    --chips-y: 1107;
+    --chips-y: 1039.75;
     --chips-w: 1080;
     --chips-gap: 18;
     --ck: 1.4167; /* 34 / 24 */
@@ -336,6 +349,52 @@
   inset-block-start: calc(var(--tag-top) * var(--u) - var(--cap-offset-text));
 }
 
+
+.ns-hero__footer {
+  font-size: calc(var(--foot-size) * var(--u));
+  inset-inline-start: calc((var(--foot-cx) - 600) * var(--u));
+  inset-block-start: calc(var(--foot-top) * var(--u) - var(--cap-offset-text));
+}
+
+.ns-hero__footer-sep {
+  margin-inline: 0.28em;
+  opacity: 0.55;
+}
+
+/* @neelscript: draws an underline in from the left and turns royal blue */
+.ns-hero__ig {
+  position: relative;
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+  transition: color 0.35s ease;
+}
+
+.ns-hero__ig::after {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: -0.16em;
+  block-size: max(1px, 0.07em);
+  background: currentColor;
+  scale: 0 1;
+  transform-origin: 0 50%;
+  transition: scale 0.45s cubic-bezier(0.65, 0, 0.2, 1);
+}
+
+.ns-hero__ig:is(:hover, :focus-visible) {
+  color: var(--royal);
+}
+
+.ns-hero__ig:is(:hover, :focus-visible)::after {
+  scale: 1 1;
+}
+
+.ns-hero__ig:focus-visible {
+  outline: max(1px, 1.5 * var(--u)) solid var(--royal);
+  outline-offset: calc(5 * var(--u));
+  border-radius: calc(3 * var(--u));
+}
 
 /* ------------------------------------------------------ services -------- */
 
@@ -613,6 +672,10 @@
 
   .ns-hero__chip {
     animation: ns-hero-rise 0.9s var(--ease-out) calc(0.55s + var(--i) * 0.08s) backwards;
+  }
+
+  .ns-hero__footer {
+    animation: ns-hero-fade-in 1s ease-out 0.9s backwards;
   }
 }
 
@@ -1015,10 +1078,12 @@
 */
 .ns-nav {
   --nu: var(--u);
-  --nav-w: calc(4 * var(--nav-col) + 2 * var(--nav-inset));
+  --nav-w: calc(3 * var(--nav-col) + 2 * var(--nav-inset));
 
   position: absolute;
-  inset-inline-start: calc((var(--cw) / 2 - var(--nav-w) / 2) * var(--nu));
+  inset-inline-start: calc(
+    (var(--cw) / 2 - var(--nav-w) / 2 + var(--nav-dx, 0)) * var(--nu)
+  );
   inset-block-start: calc(var(--nav-y) * var(--nu));
   inline-size: calc(var(--nav-w) * var(--nu));
   block-size: calc(var(--nav-h) * var(--nu));
@@ -1085,7 +1150,7 @@
 .ns-nav__list {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   block-size: 100%;
   margin: 0;
   padding: 0;
@@ -1262,29 +1327,28 @@
 
 /* ------------------------------------------------------------ ceo card -- */
 /*
-   On the menubar's line: same top, same height and the same frosted glass,
-   right-aligned to the outer margin. Hover lifts it, eases the portrait in
-   and steps the pixel arrow toward its corner.
+   One glass component on the menubar's line, right edge on the site gutter:
+   the CEO portrait and the Contact label on one piece of glass, with an
+   arrow in the top-right corner. Hover lifts it; the portrait eases in;
+   Contact rolls its letters and the arrow steps toward its corner.
 */
 .ns-ceo {
   --cu: var(--u);
 
   position: absolute;
-  inset-inline-start: calc(var(--card-x) * var(--cu));
+  /* right edge on the site gutter, measured from the hero's (viewport's)
+     right edge, not the scaled stage */
+  inset-inline-end: calc(var(--cw) * var(--u) / 2 - 50cqw + var(--gutter));
   inset-block-start: calc(var(--card-y) * var(--cu));
   inline-size: calc(var(--card-w) * var(--cu));
   block-size: calc(var(--card-h) * var(--cu));
   box-sizing: border-box;
   display: flex;
   align-items: stretch;
-  gap: calc(var(--card-gap) * var(--cu));
+  gap: calc(var(--nav-inset) * var(--cu));
   padding: calc(var(--nav-inset) * var(--cu));
-  padding-inline-end: calc(var(--card-gap) * var(--cu));
   border-radius: calc(10 * var(--cu));
   color: var(--ink);
-  text-decoration: none;
-  outline: none;
-  -webkit-tap-highlight-color: transparent;
   /* glass (same recipe as the menubar) */
   background: linear-gradient(
     180deg,
@@ -1293,7 +1357,7 @@
   );
   -webkit-backdrop-filter: blur(calc(16 * var(--cu))) saturate(1.5);
   backdrop-filter: blur(calc(16 * var(--cu))) saturate(1.5);
-  border: max(1px, 1 * var(--cu)) solid rgb(255 255 255 / 0.75);
+  /* no border box: the edge is drawn by the hairline ring + inset highlight */
   box-shadow:
     0 0 0 max(0.5px, 0.5 * var(--cu)) rgb(0 0 0 / 0.07),
     inset 0 max(1px, 1 * var(--cu)) 0 rgb(255 255 255 / 0.9),
@@ -1305,7 +1369,7 @@
     box-shadow 0.5s ease;
 }
 
-.ns-ceo:is(:hover, :focus-visible) {
+.ns-ceo:is(:hover, :focus-within) {
   translate: 0 calc(-2 * var(--cu));
   box-shadow:
     0 0 0 max(0.5px, 0.5 * var(--cu)) rgb(0 0 0 / 0.08),
@@ -1315,9 +1379,22 @@
     0 calc(3 * var(--cu)) calc(8 * var(--cu)) rgb(20 30 60 / 0.06);
 }
 
-.ns-ceo:focus-visible {
+/* portrait side */
+.ns-ceo__main {
+  display: flex;
+  flex: none;
+  align-items: stretch;
+  border-radius: calc(6 * var(--cu));
+  color: inherit;
+  text-decoration: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ns-ceo__main:focus-visible,
+.ns-ceo__contact:focus-visible {
   outline: max(1px, 1.5 * var(--cu)) solid var(--royal);
-  outline-offset: calc(3 * var(--cu));
+  outline-offset: calc(2 * var(--cu));
 }
 
 .ns-ceo__photo {
@@ -1359,57 +1436,58 @@
   line-height: 1;
 }
 
-.ns-ceo:is(:hover, :focus-visible) :is(.ns-ceo__img, .ns-ceo__avatar) {
+.ns-ceo__main:is(:hover, :focus-visible) :is(.ns-ceo__img, .ns-ceo__avatar) {
   scale: 1.07;
 }
 
-.ns-ceo__text {
+
+
+
+
+/* contact side: the label sits straight on the glass; the pixel arrow
+   marks the component's top-right corner */
+.ns-ceo__contact {
   display: flex;
   flex: 1;
-  min-inline-size: 0;
-  flex-direction: column;
-  justify-content: center;
-  gap: calc(var(--card-title) * 0.12 * var(--cu));
-  line-height: 1.1;
-  white-space: nowrap;
-}
-
-.ns-ceo__title {
-  font-size: calc(var(--card-title) * var(--cu));
-  font-weight: 600;
-  letter-spacing: -0.03em;
-}
-
-.ns-ceo__name {
-  font-size: calc(var(--card-title) * 0.74 * var(--cu));
+  align-items: center;
+  justify-content: flex-start;
+  padding-inline: calc(var(--card-gap) * 0.85 * var(--cu))
+    calc(var(--card-title) * 1.4 * var(--cu));
+  border-radius: calc(6 * var(--cu));
+  color: inherit;
+  font-size: calc(var(--nav-fs) * var(--cu));
   font-weight: 500;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.025em;
+  line-height: 1;
+  text-decoration: none;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
-.ns-ceo__role {
-  color: rgb(0 0 0 / 0.5);
-  font-size: calc(var(--card-title) * 0.66 * var(--cu));
-  font-weight: 400;
-  letter-spacing: -0.01em;
+.ns-ceo__contact:is(:hover, :focus-visible) .ns-nav__ch {
+  transform: translateY(-1.2em);
 }
 
 .ns-ceo__arrow {
-  position: absolute;
-  inset-block-start: calc(var(--card-gap) * 0.85 * var(--cu));
-  inset-inline-end: calc(var(--card-gap) * 0.85 * var(--cu));
-  inline-size: calc(var(--card-title) * 0.62 * var(--cu));
-  block-size: calc(var(--card-title) * 0.62 * var(--cu));
-  overflow: hidden;
-  fill: var(--ink);
+  position: absolute; /* placed on the whole component (.ns-ceo) */
+  inset-block-start: calc(var(--card-title) * 0.36 * var(--cu));
+  inset-inline-end: calc(var(--card-title) * 0.36 * var(--cu));
+  inline-size: calc(var(--card-title) * 1.3 * var(--cu));
+  block-size: calc(var(--card-title) * 1.3 * var(--cu));
+  overflow: visible;
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition:
+    translate 0.45s cubic-bezier(0.34, 1.56, 0.64, 1),
+    stroke 0.3s ease;
 }
 
-.ns-ceo__arrow-px {
-  transition: translate 0.45s steps(3, end);
-}
-
-.ns-ceo:is(:hover, :focus-visible) .ns-ceo__arrow-px {
-  translate: 0.34px -0.34px;
-  fill: var(--royal);
+.ns-ceo:is(:hover, :focus-within) .ns-ceo__arrow {
+  translate: calc(2 * var(--cu)) calc(-2 * var(--cu));
+  stroke: var(--royal);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1422,7 +1500,7 @@
   .ns-ceo,
   .ns-ceo__img,
   .ns-ceo__avatar,
-  .ns-ceo__arrow-px {
+  .ns-ceo__arrow {
     transition: none;
   }
 }
@@ -1430,5 +1508,64 @@
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .ns-ceo {
     background: rgb(250 249 246 / 0.92);
+  }
+}
+
+/* --------------------------------------------------------------- brand -- */
+/*
+   "NeelScript" on the menubar's line, left edge on the site gutter (mirror of
+   the card on the right). Hover / focus rolls the letters like the menu and
+   turns the blue square into a diamond.
+*/
+.ns-brand {
+  position: absolute;
+  inset-inline-start: calc(var(--cw) * var(--u) / 2 - 50cqw + var(--gutter));
+  inset-block-start: calc(var(--brand-y) * var(--u));
+  block-size: calc(var(--brand-h) * var(--u));
+  display: flex;
+  align-items: center;
+  gap: calc(var(--brand-fs) * 0.34 * var(--u));
+  color: var(--ink);
+  font-size: calc(var(--brand-fs) * var(--u));
+  font-weight: 600;
+  letter-spacing: -0.045em;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.ns-brand:focus-visible {
+  outline: max(1px, 1.5 * var(--u)) solid var(--royal);
+  outline-offset: calc(6 * var(--u));
+  border-radius: calc(4 * var(--u));
+}
+
+.ns-brand__mark {
+  flex: none;
+  inline-size: 0.36em;
+  block-size: 0.36em;
+  background: var(--royal);
+  transition: rotate 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.ns-brand:is(:hover, :focus-visible) .ns-brand__mark {
+  rotate: 45deg;
+}
+
+.ns-brand:is(:hover, :focus-visible) .ns-nav__ch {
+  transform: translateY(-1.2em);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ns-brand {
+    animation: ns-hero-rise 0.9s var(--ease-out) 0.3s backwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-brand__mark {
+    transition: none;
   }
 }

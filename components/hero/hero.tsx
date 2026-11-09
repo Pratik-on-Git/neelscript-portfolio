@@ -126,6 +126,23 @@ export function Hero() {
             text); the pointer itself is lifted above everything (z-index) */}
         <TrailCursor />
 
+        {/* 3 · footer line */}
+        <p className="ns-hero__text ns-hero__footer">
+          Pratik Das
+          <span className="ns-hero__footer-sep" aria-hidden="true">
+            |
+          </span>
+          <a
+            className="ns-hero__ig"
+            href="https://www.instagram.com/neelscript/"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="@neelscript on Instagram (opens in a new tab)"
+          >
+            @neelscript
+          </a>
+        </p>
+
         {/* 4 · services */}
         <ul className="ns-hero__services" aria-label="Services">
           {SERVICES.map(({ label, width, dx }, i) => (
@@ -140,7 +157,21 @@ export function Hero() {
         </ul>
 
         {/* 4b · menubar */}
+        {/* brand, on the menubar's line at the left gutter */}
+        <a className="ns-brand" href="#top" aria-label="NeelScript, home">
+          <span className="ns-brand__mark" aria-hidden="true" />
+          <span className="ns-nav__label" aria-hidden="true">
+            <span className="ns-nav__roll">
+              {Array.from("NeelScript").map((ch, c) => (
+                <span key={c} className="ns-nav__ch" style={{ "--c": c } as Vars}>
+                  {ch}
+                </span>
+              ))}
+            </span>
+          </span>
+        </a>
         <Menubar />
+        {/* one action on the right: CEO card + Contact pill */}
         <CeoCard />
 
         {/* 5 · tagline */}

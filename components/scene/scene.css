@@ -1,0 +1,304 @@
+/* =============================================================================
+   Scene: the hero leaves on a diagonal, uncovering the next section.
+
+   --p (0 → 1) is the hero's scroll progress, written by hero-scene.tsx.
+   The cut keeps its bottom-left corner on the hero's edge (lifting only a
+   little) while the right side rises by a tilt that grows to 9vw, so the
+   edge steepens as the hero leaves, with the next section close beneath.
+   ========================================================================== */
+
+.ns-scene {
+  --p: 0;
+
+  position: relative;
+  z-index: 1;
+}
+
+.ns-scene__clip {
+  overflow: clip;
+}
+
+.ns-scene[data-live] .ns-scene__clip {
+  --cut-l: calc(var(--p) * 2vw);
+  --cut-r: calc(var(--p) * 2vw + var(--p) * 9vw);
+
+  clip-path: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - var(--cut-r)),
+    0 calc(100% - var(--cut-l))
+  );
+}
+
+/* the content drifts down as it leaves: the cut outruns it */
+.ns-scene[data-live] .ns-scene__drift {
+  translate: 0 calc(var(--p) * 12%);
+  will-change: translate;
+}
+
+/* ----------------------------------------------------------- about intro -- */
+
+.ns-about {
+  --paper: #f2f0eb; /* the hero's background */
+  --ink: #000000;
+  --rule: rgb(0 0 0 / 0.14);
+  --mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", monospace;
+
+  position: relative;
+  z-index: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-space-grotesk), "Space Grotesk", ui-sans-serif,
+    system-ui, sans-serif;
+}
+
+.ns-about__inner {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100svh;
+  padding-inline: var(--gutter);
+  padding-block-start: clamp(56px, 6.5vw, 128px);
+}
+
+/* --- index bar ------------------------------------------------------------ */
+
+.ns-index {
+  position: relative;
+  padding-block-start: clamp(12px, 0.95vw, 20px);
+}
+
+.ns-index__rule {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-start: 0;
+  block-size: 1px;
+  background: var(--rule);
+  transform-origin: 0 50%;
+}
+
+.ns-index__row {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(8px, 1vw, 20px);
+  align-items: baseline;
+  font-size: clamp(13px, 0.82vw, 16px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+/* each label sits in a one-line window so it can rise into view */
+.ns-index__cell {
+  margin: 0;
+  overflow: hidden;
+  overflow: clip;
+  font: inherit;
+}
+
+.ns-index__cell > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+}
+
+.ns-index__cell--num {
+  grid-column: 1 / span 3;
+}
+
+.ns-index__cell--label {
+  grid-column: 8 / span 3;
+}
+
+.ns-index__cell--year {
+  grid-column: 11 / span 2;
+  justify-self: end;
+}
+
+.ns-index__diamond {
+  inline-size: 0.42em;
+  block-size: 0.42em;
+  background: currentColor;
+  rotate: 45deg;
+}
+
+/* --- facts grid ----------------------------------------------------------- */
+
+.ns-facts {
+  --cols: 4;
+
+  position: relative;
+  flex: 1;
+  margin-block-start: clamp(36px, 3.4vw, 64px);
+  padding-block: clamp(28px, 1.9vw, 40px) clamp(80px, 9vw, 180px);
+}
+
+/* full-height column dividers */
+.ns-facts__guides {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  pointer-events: none;
+}
+
+.ns-facts__guide {
+  border-inline-start: 1px solid var(--rule);
+  transform-origin: 50% 0;
+}
+
+.ns-facts__guide--end {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-end: 0;
+  border-inline-start: 0;
+  border-inline-end: 1px solid var(--rule);
+}
+
+.ns-facts__band {
+  position: relative;
+}
+
+/* hairlines above and below the row, out to the screen edges */
+.ns-facts__line {
+  position: absolute;
+  inset-inline: calc(-1 * var(--gutter));
+  block-size: 1px;
+  background: var(--rule);
+  transform-origin: 0 50%;
+}
+
+.ns-facts__line--top {
+  inset-block-start: 0;
+}
+
+.ns-facts__line--bottom {
+  inset-block-end: 0;
+}
+
+/* "+" where the outer columns cross the hairlines */
+.ns-facts__cross {
+  position: absolute;
+  z-index: 1;
+  inline-size: 15px;
+  block-size: 15px;
+  translate: -50% -50%;
+}
+
+.ns-facts__cross::before,
+.ns-facts__cross::after {
+  content: "";
+  position: absolute;
+  background: var(--ink);
+}
+
+.ns-facts__cross::before {
+  inset-inline: 0;
+  inset-block-start: 7px;
+  block-size: 1px;
+}
+
+.ns-facts__cross::after {
+  inset-block: 0;
+  inset-inline-start: 7px;
+  inline-size: 1px;
+}
+
+.ns-facts__cross--tl {
+  inset-block-start: 0.5px;
+  inset-inline-start: 0.5px;
+}
+.ns-facts__cross--tr {
+  inset-block-start: 0.5px;
+  inset-inline-start: calc(100% - 0.5px);
+}
+.ns-facts__cross--bl {
+  inset-block-start: calc(100% - 0.5px);
+  inset-inline-start: 0.5px;
+}
+.ns-facts__cross--br {
+  inset-block-start: calc(100% - 0.5px);
+  inset-inline-start: calc(100% - 0.5px);
+}
+
+.ns-facts__row {
+  display: grid;
+  grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
+  margin: 0;
+}
+
+.ns-fact {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 0.95vw, 18px);
+  padding: clamp(22px, 1.6vw, 32px) clamp(16px, 1.3vw, 26px);
+  font-family: var(--mono);
+  font-size: clamp(12px, 0.8vw, 15.5px);
+  letter-spacing: 0.04em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  outline: none;
+  transition: background-color 0.4s ease;
+}
+
+.ns-fact:is(:hover, :focus-visible) {
+  background: rgb(0 0 0 / 0.025);
+}
+
+.ns-fact:focus-visible {
+  box-shadow: inset 0 0 0 1.5px #005bff;
+}
+
+.ns-fact__label-wrap,
+.ns-fact__value-wrap {
+  margin: 0;
+  overflow: hidden;
+  overflow: clip;
+}
+
+.ns-fact__label {
+  display: block;
+  color: rgb(0 0 0 / 0.5);
+}
+
+.ns-fact__value {
+  display: block;
+  min-block-size: 1.25em;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 960px) {
+  .ns-facts {
+    --cols: 2;
+  }
+  .ns-fact:nth-child(n + 3) {
+    border-block-start: 1px solid var(--rule);
+  }
+}
+
+@media (max-width: 560px) {
+  .ns-facts {
+    --cols: 1;
+  }
+  .ns-fact:nth-child(n + 2) {
+    border-block-start: 1px solid var(--rule);
+  }
+  .ns-index__cell--num {
+    grid-column: 1 / span 4;
+  }
+  .ns-index__cell--label {
+    grid-column: 5 / span 5;
+    justify-self: center;
+  }
+  .ns-index__cell--year {
+    grid-column: 10 / span 3;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ns-fact {
+    transition: none;
+  }
+}

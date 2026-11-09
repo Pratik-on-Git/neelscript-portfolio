@@ -5,6 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --spacing-gutter: var(--gutter);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-space-grotesk);
@@ -49,6 +50,13 @@
 }
 
 :root {
+  /* Site-wide side padding (left = right) for every section.
+     3.21vw is 61.6px at 1920 wide (the hero's outer margin); never tighter
+     than 16px on phones or wider than 72px on very large screens.
+     Use it via the Tailwind utilities px-gutter / pl-gutter / pr-gutter /
+     mx-gutter (spacing token below) or var(--gutter) in CSS. */
+  --gutter: clamp(16px, 3.21vw, 72px);
+
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
