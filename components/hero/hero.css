@@ -29,6 +29,13 @@
   initial-value: 1px;
 }
 
+/* "cover" unit for full-bleed background layers (the blurred echo) */
+@property --ue {
+  syntax: "<length>";
+  inherits: true;
+  initial-value: 1px;
+}
+
 /* ----------------------------------------------------------- section ---- */
 
 .ns-hero {
@@ -103,6 +110,9 @@
   --cw: 1920;
   --ch: 1080;
   --u: min(100cqw / 1920, 100cqh / 1080);
+  /* background layers fill the whole hero, like background-size: cover;
+     equal to --u at exactly 16:9, larger on wider / taller viewports */
+  --ue: max(100cqw / 1920, 100cqh / 1080);
 
   /* lockup: wordmark frame origin (glyph x 0, glyph y 290) and scale */
   --lx: 328;
@@ -142,6 +152,7 @@
     --cw: 1080;
     --ch: 1600;
     --u: min(100cqw / 1080, 100cqh / 1600);
+    --ue: max(100cqw / 1080, 100cqh / 1600);
 
     --lk: 0.78;
     --lx: 47.04; /* 540 - 632 * 0.78 → wordmark centred */
@@ -172,15 +183,24 @@
   display: block;
   overflow: visible;
   /* glyph point (X, Y) → design (lx + lk(-729 + 1.964399X),
-                                 ly + lk(-810.774 + 1.964399Y)) */
-  inset-inline-start: calc((var(--lx) - 760.43 * var(--lk)) * var(--u));
-  inset-block-start: calc((var(--ly) - 842.204 * var(--lk)) * var(--u));
-  inline-size: calc(2545.861 * var(--lk) * var(--u));
-  block-size: calc(2184.412 * var(--lk) * var(--u));
+                                 ly + lk(-810.774 + 1.964399Y)).
+     Laid out around the canvas centre in the cover unit (--ue), so it always
+     bleeds past every edge of the hero, at any aspect ratio. At 16:9 --ue
+     equals --u and this is exactly the design. */
+  inset-inline-start: calc(
+    var(--cw) * var(--u) / 2 +
+      (var(--lx) - 760.43 * var(--lk) - var(--cw) / 2) * var(--ue)
+  );
+  inset-block-start: calc(
+    var(--ch) * var(--u) / 2 +
+      (var(--ly) - 842.204 * var(--lk) - var(--ch) / 2) * var(--ue)
+  );
+  inline-size: calc(2545.861 * var(--lk) * var(--ue));
+  block-size: calc(2184.412 * var(--lk) * var(--ue));
   fill: var(--echo);
   pointer-events: none;
   /* pointer parallax (set by the wordmark's GSAP loop, design px) */
-  translate: calc(var(--ex, 0) * var(--u)) calc(var(--ey, 0) * var(--u));
+  translate: calc(var(--ex, 0) * var(--ue)) calc(var(--ey, 0) * var(--ue));
 }
 
 /* -------------------------------------------------------- 2 · grid ------ */
