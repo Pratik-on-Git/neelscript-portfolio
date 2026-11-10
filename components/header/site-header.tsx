@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useRef, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { Menubar } from "../hero/nav";
 import { CeoCard } from "../hero/ceo-card";
+import { MenuToggle, MobileMenu } from "./mobile-menu";
 import "../hero/hero.css";
 import "./header.css";
 
@@ -15,9 +22,15 @@ type Vars = CSSProperties & Record<`--${string}`, string | number>;
  * Scrolling down slides it away; scrolling up brings it straight back,
  * docked near the top over a soft progressive blur. Small jitters are
  * ignored, and keyboard focus inside it always keeps it on screen.
+ *
+ * Below 768px wide the row becomes a compact bar (brand + Menu button) and
+ * the menu and Contact card move into a slide-in sidebar (mobile-menu.tsx).
  */
 export function SiteHeader() {
   const ref = useRef<HTMLElement>(null);
+  const toggleRef = useRef<HTMLButtonElement>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
 
   useEffect(() => {
     const el = ref.current;
@@ -32,7 +45,10 @@ export function SiteHeader() {
 
     const set = (floating: boolean, hidden: boolean) => {
       el.toggleAttribute("data-float", floating);
-      el.toggleAttribute("data-hidden", hidden && !el.contains(document.activeElement));
+      el.toggleAttribute(
+        "data-hidden",
+        hidden && !el.contains(document.activeElement),
+      );
     };
 
     const update = () => {
@@ -68,26 +84,48 @@ export function SiteHeader() {
   }, []);
 
   return (
-    <header ref={ref} className="ns-header">
-      <div className="ns-header__frame">
-        <span className="ns-header__veil" aria-hidden="true" />
-        <div className="ns-header__row">
-          <a className="ns-brand" href="#top" aria-label="NeelScript, home">
-            <span className="ns-brand__mark" aria-hidden="true" />
-            <span className="ns-nav__label" aria-hidden="true">
-              <span className="ns-nav__roll">
-                {Array.from("NeelScript").map((ch, c) => (
-                  <span key={c} className="ns-nav__ch" style={{ "--c": c } as Vars}>
-                    {ch}
-                  </span>
-                ))}
+    <>
+      <header
+        ref={ref}
+        className="ns-header"
+        data-menu-open={menuOpen ? "" : undefined}
+      >
+        <div className="ns-header__frame">
+          <span className="ns-header__veil" aria-hidden="true" />
+          <div className="ns-header__row">
+            <a className="ns-brand" href="#top" aria-label="NeelScript, home">
+              <span className="ns-brand__mark" aria-hidden="true" />
+              <span className="ns-nav__label" aria-hidden="true">
+                <span className="ns-nav__roll">
+                  {Array.from("NeelScript").map((ch, c) => (
+                    <span
+                      key={c}
+                      className="ns-nav__ch"
+                      style={{ "--c": c } as Vars}
+                    >
+                      {ch}
+                    </span>
+                  ))}
+                </span>
               </span>
-            </span>
-          </a>
-          <Menubar />
-          <CeoCard />
+            </a>
+            <Menubar />
+            <CeoCard />
+            <MenuToggle
+              open={menuOpen}
+              onToggle={() => setMenuOpen((o) => !o)}
+              buttonRef={toggleRef}
+            />
+          </div>
         </div>
-      </div>
-    </header>
+      </header>
+      {/* outside the header: its row is translated, which would trap a
+        position: fixed sidebar inside it */}
+      <MobileMenu
+        open={menuOpen}
+        onClose={closeMenu}
+        returnFocusRef={toggleRef}
+      />
+    </>
   );
 }

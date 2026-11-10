@@ -208,21 +208,35 @@
   }
 }
 
+/* Below 768px the header is a compact bar (brand + Menu button, header.css)
+   with the menu in a sidebar, so the menu row above is left empty. The core
+   group (tagline, wordmark, chips) moves up by 160 into it, which evens out
+   the space above the tagline and below the chips; the footer stays put. */
+@container hero (orientation: portrait) and (max-width: 767.98px) {
+  .ns-hero__stage {
+    --ly: 485.41; /* 645.41 - 160 */
+    --tag-top: 394.15; /* 554.15 - 160 */
+    --chips-y: 879.75; /* 1039.75 - 160 */
+  }
+}
+
 /* Phones (portrait, narrow): same composition, type and pills sized up so
-   they read at arm's length (the header row matches in header.css).
-     margin 120 · brand + card row 120 · gap 48 · menu 120 ·
-     section gap 138.67 · tagline cap 50.4 · gap 56 · wordmark 331.6 ·
-     gap 56 · chips 274.06 · section gap 138.67 · footer cap 26.6 · margin 120 */
+   they read at arm's length (the header bar is in header.css).
+     margin 120 · brand + Menu bar 120 · section gap 266.67 ·
+     tagline cap 50.4 · gap 56 · wordmark 331.6 · gap 56 · chips 274.06 ·
+     section gap 278.67 · footer cap 26.6 · margin 120
+   (the core group sits 140 above the old two-row layout's spot, where it
+   reads balanced once the slack is shared out on real phones) */
 @container hero (orientation: portrait) and (max-width: 539.98px) {
   .ns-hero__stage {
-    --ly: 646.33; /* ink top lands on y 653.07 */
+    --ly: 506.33; /* ink top lands on y 513.07 */
 
     --tag-size: 72;
-    --tag-top: 546.67;
+    --tag-top: 406.67;
     --foot-size: 38;
     --foot-top: 1453.4;
 
-    --chips-y: 1040.67;
+    --chips-y: 900.67;
     --chips-gap: 22;
     --ck: 1.6;
   }

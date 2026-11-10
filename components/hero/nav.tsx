@@ -6,7 +6,7 @@ import type { CSSProperties } from "react";
  * Pure markup + CSS (hero.css, "menubar" section); no client JS.
  */
 
-const ITEMS = [
+export const NAV_ITEMS = [
   { label: "Home", href: "#top" },
   { label: "Portfolio", href: "#portfolio" },
   { label: "About", href: "#about" },
@@ -20,7 +20,7 @@ export function Menubar({ current = "Home" }: { current?: string }) {
       {/* glass tab: rests on the current page, glides to the hovered item */}
       <span className="ns-nav__tab" aria-hidden="true" />
       <ul className="ns-nav__list">
-        {ITEMS.map(({ label, href }, i) => (
+        {NAV_ITEMS.map(({ label, href }, i) => (
           <li key={label} className="ns-nav__item" style={{ "--i": i } as Vars}>
             <a
               className="ns-nav__link"
