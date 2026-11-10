@@ -1088,14 +1088,16 @@
    label's letters.
 */
 .ns-nav {
-  --nu: var(--u);
+  /* size: the header's scale (floored on small screens, header.css);
+     position: the hero's own scale, so it stays on the design's line */
+  --nu: var(--hu, var(--u));
   --nav-w: calc(3 * var(--nav-col) + 2 * var(--nav-inset));
 
   position: absolute;
   inset-inline-start: calc(
     50% + (var(--nav-dx, 0) - var(--nav-w) / 2) * var(--nu)
   );
-  inset-block-start: calc(var(--stage-top) + var(--nav-y) * var(--nu));
+  inset-block-start: calc(var(--stage-top) + var(--nav-y) * var(--u));
   inline-size: calc(var(--nav-w) * var(--nu));
   block-size: calc(var(--nav-h) * var(--nu));
   box-sizing: border-box;
@@ -1344,12 +1346,12 @@
    Contact rolls its letters and the arrow steps toward its corner.
 */
 .ns-ceo {
-  --cu: var(--u);
+  --cu: var(--hu, var(--u));
 
   position: absolute;
   /* right edge on the site gutter */
   inset-inline-end: var(--gutter);
-  inset-block-start: calc(var(--stage-top) + var(--card-y) * var(--cu));
+  inset-block-start: calc(var(--stage-top) + var(--card-y) * var(--u));
   inline-size: calc(var(--card-w) * var(--cu));
   block-size: calc(var(--card-h) * var(--cu));
   box-sizing: border-box;
@@ -1528,15 +1530,17 @@
    turns the blue square into a diamond.
 */
 .ns-brand {
+  --bu: var(--hu, var(--u));
+
   position: absolute;
   inset-inline-start: var(--gutter);
   inset-block-start: calc(var(--stage-top) + var(--brand-y) * var(--u));
-  block-size: calc(var(--brand-h) * var(--u));
+  block-size: calc(var(--brand-h) * var(--bu));
   display: flex;
   align-items: center;
-  gap: calc(var(--brand-fs) * 0.34 * var(--u));
+  gap: calc(var(--brand-fs) * 0.34 * var(--bu));
   color: var(--ink);
-  font-size: calc(var(--brand-fs) * var(--u));
+  font-size: calc(var(--brand-fs) * var(--bu));
   font-weight: 600;
   letter-spacing: -0.045em;
   line-height: 1;
@@ -1547,9 +1551,9 @@
 }
 
 .ns-brand:focus-visible {
-  outline: max(1px, 1.5 * var(--u)) solid var(--royal);
-  outline-offset: calc(6 * var(--u));
-  border-radius: calc(4 * var(--u));
+  outline: max(1px, 1.5 * var(--bu)) solid var(--royal);
+  outline-offset: calc(6 * var(--bu));
+  border-radius: calc(4 * var(--bu));
 }
 
 .ns-brand__mark {

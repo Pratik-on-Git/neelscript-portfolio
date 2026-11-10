@@ -33,6 +33,12 @@
   --hh: max(100svh, min(56.25cqw, 600px)); /* the hero's height */
   --u: min(100cqw / 1920, var(--hh) / 1080);
   --stage-top: calc(var(--hh) / 2 - var(--ch) * var(--u) / 2);
+  /* The row's own scale. Below ~1150px wide the hero's --u would shrink the
+     menu to 10-12px type and sub-40px targets (tablets, phones on their
+     side), so it never drops under 0.64 design px (14px menu type), capped
+     by the width so brand, menu and card still fit between the gutters.
+     Positions stay on --u: the row keeps its place in the hero. */
+  --hu: max(var(--u), min(0.64px, 100cqw / 1350));
 
   /* row layout (design px), centred on the hero's header line */
   --nav-y: 61.6;
@@ -51,7 +57,9 @@
 
   /* where the row starts / ends on screen at rest, and where it docks */
   --row-top: calc(var(--stage-top) + var(--card-y) * var(--u));
-  --row-bottom: calc(var(--stage-top) + (var(--nav-y) + var(--nav-h)) * var(--u));
+  --row-bottom: calc(
+    var(--stage-top) + var(--nav-y) * var(--u) + var(--nav-h) * var(--hu)
+  );
   --dock: clamp(10px, calc(var(--gutter) * 0.42), 26px);
 
   position: relative;
@@ -72,6 +80,11 @@
     --ch: 1600;
     --hh: max(100svh, min(100cqw * 1600 / 1080, 600px));
     --u: min(100cqw / 1080, var(--hh) / 1600);
+    /* the row already spans gutter to gutter: no room to grow it */
+    --hu: var(--u);
+    /* the hero shares its spare height out instead of centring the stage;
+       the row's top margin takes 6% of it (see hero.css) */
+    --stage-top: calc(max(0px, var(--hh) - var(--ch) * var(--u)) * 0.06);
 
     /* brand + card share the first row; the menu spans the second */
     --card-w: 400;
@@ -87,6 +100,24 @@
     --nav-h: 100;
     --nav-inset: 8;
     --nav-fs: 34;
+  }
+
+  /* Phones: bigger type and ~44px tap targets (hero.css has the matching
+     phone hierarchy: margin 120 · row 120 · gap 48 · menu 120 · …) */
+  @container ns-header (max-width: 599.98px) {
+    .ns-header__frame {
+      --card-w: 420;
+      --card-h: 120;
+      --card-y: 120;
+      --card-gap: 22;
+      --card-title: 34;
+      --brand-y: 120;
+      --brand-h: 120;
+      --brand-fs: 46;
+      --nav-y: 288;
+      --nav-h: 120;
+      --nav-fs: 40;
+    }
   }
 }
 
