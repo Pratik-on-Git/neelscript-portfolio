@@ -104,7 +104,7 @@
 
   /* Phones: bigger type and ~44px tap targets (hero.css has the matching
      phone hierarchy: margin 120 · row 120 · gap 48 · menu 120 · …) */
-  @container ns-header (max-width: 599.98px) {
+  @container ns-header (max-width: 539.98px) {
     .ns-header__frame {
       --card-w: 420;
       --card-h: 120;

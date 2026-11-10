@@ -213,7 +213,7 @@
      margin 120 · brand + card row 120 · gap 48 · menu 120 ·
      section gap 138.67 · tagline cap 50.4 · gap 56 · wordmark 331.6 ·
      gap 56 · chips 274.06 · section gap 138.67 · footer cap 26.6 · margin 120 */
-@container hero (orientation: portrait) and (max-width: 599.98px) {
+@container hero (orientation: portrait) and (max-width: 539.98px) {
   .ns-hero__stage {
     --ly: 646.33; /* ink top lands on y 653.07 */
 
