@@ -400,7 +400,7 @@
 .ns-drawer__brand {
   display: inline-flex;
   align-items: center;
-  gap: 7.5px;
+  gap: 6.6px;
   border-radius: 4px;
   color: inherit;
   font-size: 22px;
@@ -413,7 +413,7 @@
 }
 
 .ns-drawer__brand:is(:hover, :focus-visible) .ns-brand__mark {
-  rotate: 45deg;
+  rotate: -12deg;
 }
 
 .ns-drawer__close {

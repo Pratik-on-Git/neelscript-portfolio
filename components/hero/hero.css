@@ -1273,11 +1273,14 @@
   position: absolute;
   display: block;
   overflow: visible;
-  inset-inline-start: calc(-1700 * var(--u));
-  /* drawn in the design's coordinates; moves with the wordmark group */
-  inset-block-start: calc(var(--shift-y, 0) * var(--u));
-  inline-size: calc(3700 * var(--u));
-  block-size: calc(1080 * var(--u));
+  /* Drawn in the landscape design's coordinates, where the lockup sits at
+     (328, 290) at scale 1 (+ the 46.3 shift). Placed and scaled from the
+     lockup's own --lx / --ly / --lk, so it rides the wordmark in every
+     composition: at landscape this is exactly left -1700, top 46.3. */
+  inset-inline-start: calc((var(--lx) - 2028 * var(--lk)) * var(--u));
+  inset-block-start: calc((var(--ly) - 290 * var(--lk)) * var(--u));
+  inline-size: calc(3700 * var(--lk) * var(--u));
+  block-size: calc(1080 * var(--lk) * var(--u));
   pointer-events: none;
 }
 
@@ -1318,13 +1321,6 @@
   pointer-events: visiblePainted;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
-}
-
-/* no room beside the wordmark in the portrait composition */
-@container hero (orientation: portrait) {
-  .ns-trail {
-    display: none;
-  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -1541,7 +1537,7 @@
 /*
    "NeelScript" on the menubar's line, left edge on the site gutter (mirror of
    the card on the right). Hover / focus rolls the letters like the menu and
-   turns the blue square into a diamond.
+   tilts the NS logo.
 */
 .ns-brand {
   --bu: var(--hu, var(--u));
@@ -1552,7 +1548,7 @@
   block-size: calc(var(--brand-h) * var(--bu));
   display: flex;
   align-items: center;
-  gap: calc(var(--brand-fs) * 0.34 * var(--bu));
+  gap: calc(var(--brand-fs) * 0.3 * var(--bu));
   color: var(--ink);
   font-size: calc(var(--brand-fs) * var(--bu));
   font-weight: 600;
@@ -1570,16 +1566,18 @@
   border-radius: calc(4 * var(--bu));
 }
 
+/* the NS logo (brand-mark.tsx): a circle sized to the wordmark, tilting on
+   hover with the same springy ease the square used */
 .ns-brand__mark {
   flex: none;
-  inline-size: 0.36em;
-  block-size: 0.36em;
-  background: var(--royal);
+  display: block;
+  inline-size: 1.2em;
+  block-size: 1.2em;
   transition: rotate 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .ns-brand:is(:hover, :focus-visible) .ns-brand__mark {
-  rotate: 45deg;
+  rotate: -12deg;
 }
 
 .ns-brand:is(:hover, :focus-visible) .ns-nav__ch {

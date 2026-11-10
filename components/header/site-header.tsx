@@ -10,6 +10,7 @@ import {
 import { Menubar } from "../hero/nav";
 import { CeoCard } from "../hero/ceo-card";
 import { MenuToggle, MobileMenu } from "./mobile-menu";
+import { BrandMark } from "./brand-mark";
 import "../hero/hero.css";
 import "./header.css";
 
@@ -94,7 +95,7 @@ export function SiteHeader() {
           <span className="ns-header__veil" aria-hidden="true" />
           <div className="ns-header__row">
             <a className="ns-brand" href="#top" aria-label="NeelScript, home">
-              <span className="ns-brand__mark" aria-hidden="true" />
+              <BrandMark />
               <span className="ns-nav__label" aria-hidden="true">
                 <span className="ns-nav__roll">
                   {Array.from("NeelScript").map((ch, c) => (

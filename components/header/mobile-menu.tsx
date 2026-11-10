@@ -10,6 +10,7 @@ import {
 import { NAV_ITEMS } from "../hero/nav";
 import { CeoCard } from "../hero/ceo-card";
 import { setScrollLocked } from "../smooth-scroll";
+import { BrandMark } from "./brand-mark";
 
 type Vars = CSSProperties & Record<`--${string}`, string | number>;
 
@@ -165,7 +166,7 @@ export function MobileMenu({
             aria-label="NeelScript, home"
             onClick={onLinkClick}
           >
-            <span className="ns-brand__mark" aria-hidden="true" />
+            <BrandMark />
             NeelScript
           </a>
           <button

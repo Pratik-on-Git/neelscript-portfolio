@@ -44,14 +44,19 @@ const DEG = 180 / Math.PI;
 /** rotation (deg) that makes the tip point along `angleDeg` */
 const rotFor = (angleDeg: number) => angleDeg - TIP_ANGLE * DEG;
 
+/** extra scale for the drawn pointer and trail: 1 in the landscape design;
+    in portrait the layer shrinks with the wordmark, so this keeps the
+    pointer ~32px and the trail legible on a phone (set by measure()) */
+let k = 1;
+
 /** pivot that puts the tip on `tip` at rotation `rotDeg` */
-function pivotFor(tip: Pt, rotDeg: number): Pt {
+function pivotFor(tip: Pt, rotDeg: number, size = SIZE * k): Pt {
   const r = rotDeg / DEG;
   const c = Math.cos(r);
   const s = Math.sin(r);
   return [
-    tip[0] - (TIP[0] * c - TIP[1] * s) * SIZE,
-    tip[1] - (TIP[0] * s + TIP[1] * c) * SIZE,
+    tip[0] - (TIP[0] * c - TIP[1] * s) * size,
+    tip[1] - (TIP[0] * s + TIP[1] * c) * size,
   ];
 }
 
@@ -113,22 +118,30 @@ const ANCHORS: readonly { i: number; tip: Pt; angle: number }[] = [
 // (this layer is drawn in the design's coordinates and shifted down 46.3
 //  with the wordmark group: the header row is at y 15–81 here, the footer
 //  at 955–972)
-const BOUNDS = { x0: 70, x1: 1850, y0: 120, y1: 900 };
+type Bounds = { x0: number; x1: number; y0: number; y1: number };
+type Box = readonly [number, number, number, number];
+const BOUNDS: Bounds = { x0: 70, x1: 1850, y0: 120, y1: 900 };
 /** keep-out boxes for free waypoints: tagline, header row, tag, chips, footer */
-const KEEP_OUT = [
+const KEEP_OUT: readonly Box[] = [
   [640, 186, 1280, 250],
   [40, 0, 1880, 100],
   [1060, 200, 1520, 430],
   [470, 782, 1450, 852],
   [800, 930, 1120, 990],
-] as const;
+];
+/* The landscape numbers above are the design's. In the portrait
+   composition the layer is the same drawing, re-placed and scaled with the
+   wordmark (hero.css), but the page around it differs, so the roaming area
+   and keep-outs are measured off the live page instead (see measure()). */
+let bounds: Bounds = BOUNDS;
+let keepOut: readonly Box[] = KEEP_OUT;
 
 /* --- the design's rest pose and trail --------------------------------- */
 
 const REST_ANGLE = TIP_ANGLE * DEG; // the design's pointer angle
 const REST_TIP: Pt = [371.7, 683];
 const REST_ROT = rotFor(REST_ANGLE);
-const REST_PIVOT = pivotFor(REST_TIP, REST_ROT);
+const REST_PIVOT = pivotFor(REST_TIP, REST_ROT, SIZE);
 const REST_TAIL = toFrame(REST_PIVOT, REST_ROT, ATTACH);
 
 /** the design's trail, measured off the Figma frame: it comes in from
@@ -346,18 +359,74 @@ function turning(r: Route) {
 function straying(r: Route) {
   let s = 0;
   for (let i = 0; i < r.xs.length; i += 3) {
-    s += Math.max(0, BOUNDS.x0 - r.xs[i]) + Math.max(0, r.xs[i] - BOUNDS.x1);
-    s += Math.max(0, BOUNDS.y0 - r.ys[i]) + Math.max(0, r.ys[i] - BOUNDS.y1);
+    s += Math.max(0, bounds.x0 - r.xs[i]) + Math.max(0, r.xs[i] - bounds.x1);
+    s += Math.max(0, bounds.y0 - r.ys[i]) + Math.max(0, r.ys[i] - bounds.y1);
   }
   return s;
 }
 
 const clampPt = (p: Pt): Pt => [
-  Math.max(BOUNDS.x0, Math.min(BOUNDS.x1, p[0])),
-  Math.max(BOUNDS.y0, Math.min(BOUNDS.y1, p[1])),
+  Math.max(bounds.x0, Math.min(bounds.x1, p[0])),
+  Math.max(bounds.y0, Math.min(bounds.y1, p[1])),
 ];
 const inKeepOut = (p: Pt) =>
-  KEEP_OUT.some(([a, b, c, d]) => p[0] >= a && p[0] <= c && p[1] >= b && p[1] <= d);
+  keepOut.some(([a, b, c, d]) => p[0] >= a && p[0] <= c && p[1] >= b && p[1] <= d);
+
+/** how far the pointer's body reaches back from its tip (layer units) */
+const BODY_REACH = 75;
+
+/** can the pointer tap this spot without its body leaving the roaming area?
+    (in portrait the D's left and the r's right sit near the screen edges) */
+const fits = (a: { tip: Pt; angle: number }) => {
+  const bx = a.tip[0] - Math.cos(a.angle / DEG) * BODY_REACH * k;
+  const by = a.tip[1] - Math.sin(a.angle / DEG) * BODY_REACH * k;
+  const m = 95; // the bounds' 70 edge margin, plus a little grazing room
+  return (
+    bx >= bounds.x0 - m && bx <= bounds.x1 + m && by >= bounds.y0 - m && by <= bounds.y1 + m
+  );
+};
+
+/**
+ * Landscape: the design's bounds and keep-outs. Portrait: the hero's
+ * visible area (below the header bar) and the boxes of the tagline, tag,
+ * chips and footer, mapped into the layer's coordinates.
+ */
+function measure(svg: SVGSVGElement) {
+  const hero = svg.closest<HTMLElement>(".ns-hero");
+  const ctm = svg.getScreenCTM();
+  if (!hero || !ctm || hero.clientWidth >= hero.clientHeight) {
+    bounds = BOUNDS;
+    keepOut = KEEP_OUT;
+    k = 1;
+    return;
+  }
+  // the pointer is ~71 layer units tall; aim for ~32 CSS px on screen
+  k = Math.min(1.8, Math.max(1, 32 / (71 * Math.hypot(ctm.a, ctm.b))));
+  const inv = ctm.inverse();
+  const toLayer = (x: number, y: number) => new DOMPoint(x, y).matrixTransform(inv);
+  const box = (r: DOMRect, pad: number): Box => {
+    const a = toLayer(r.left, r.top);
+    const b = toLayer(r.right, r.bottom);
+    return [a.x - pad, a.y - pad, b.x + pad, b.y + pad];
+  };
+  const h = hero.getBoundingClientRect();
+  // the fixed header's resting bottom edge (its row is laid out from the
+  // viewport top, and the hero starts at the top of the page)
+  let headerBottom = 0;
+  document.querySelectorAll<HTMLElement>(".ns-header__row > *").forEach((el) => {
+    if (el.offsetParent) headerBottom = Math.max(headerBottom, el.offsetTop + el.offsetHeight);
+  });
+  const tl = toLayer(h.left, h.top + headerBottom);
+  const br = toLayer(h.right, h.bottom);
+  const edge = 70; // keep the pointer's halo off the screen edges
+  bounds = { x0: tl.x + edge, x1: br.x - edge, y0: tl.y + edge + 30, y1: br.y - edge };
+  keepOut = Array.from(
+    hero.querySelectorAll<HTMLElement>(
+      ".ns-hero__tagline, .ns-hero__label, .ns-hero__chip, .ns-hero__footer",
+    ),
+    (el) => box(el.getBoundingClientRect(), 30),
+  );
+}
 const shortest = (from: number, to: number) => ((to - from + 540) % 360) - 180;
 const rand = gsap.utils.random;
 
@@ -381,6 +450,7 @@ export function TrailCursor() {
       mm.add("(prefers-reduced-motion: no-preference)", () => {
         svg.setAttribute("data-ready", "");
         top.setAttribute("data-ready", "");
+        measure(svg); // landscape design, or the portrait page around it
 
         /* --- state ----------------------------------------------------- */
         const tip = { x: REST_TIP[0], y: REST_TIP[1] }; // where the tip is
@@ -468,7 +538,7 @@ export function TrailCursor() {
           rot += Math.max(-cap, Math.min(cap, step));
 
           const pivot = pivotFor([tip.x, tip.y], rot);
-          const s = SIZE * hover.s * press.s;
+          const s = SIZE * k * hover.s * press.s;
           const t = `translate(${(pivot[0] + press.x).toFixed(2)} ${(
             pivot[1] +
             press.y +
@@ -527,9 +597,10 @@ export function TrailCursor() {
             for (let i = ai; i <= n && cum[i] < d1; i++) d += `L${f1(px(i))} ${f1(py(i))}`;
             d += `L${f1(bx)} ${f1(by)}`;
             el.setAttribute("d", d);
-            const k = (j + 0.5) / BANDS;
-            el.style.opacity = (0.05 + 0.95 * k ** 1.5).toFixed(3);
-            el.style.strokeWidth = (5.83 * (0.4 + 0.6 * k)).toFixed(2);
+            const t = (j + 0.5) / BANDS; // 0 oldest … 1 at the pointer
+            el.style.opacity = (0.05 + 0.95 * t ** 1.5).toFixed(3);
+            el.style.strokeWidth = (5.83 * k * (0.4 + 0.6 * t)).toFixed(2);
+            el.style.strokeDasharray = k === 1 ? "" : `${(22 * k).toFixed(1)} ${(30 * k).toFixed(1)}`;
             el.style.strokeDashoffset = (trimmed + d0 - flow).toFixed(2);
           }
         };
@@ -638,7 +709,7 @@ export function TrailCursor() {
           let best: Pt = clampPt([tip.x, tip.y - 160]);
           let bestD = -1;
           for (let k = 0, found = 0; k < 80 && found < 5; k++) {
-            const p: Pt = [rand(BOUNDS.x0 + 80, BOUNDS.x1 - 80), rand(BOUNDS.y0 + 40, BOUNDS.y1 - 60)];
+            const p: Pt = [rand(bounds.x0 + 80, bounds.x1 - 80), rand(bounds.y0 + 40, bounds.y1 - 60)];
             if (inKeepOut(p)) continue;
             found++;
             const d = Math.hypot(p[0] - tip.x, p[1] - tip.y);
@@ -655,7 +726,8 @@ export function TrailCursor() {
         const weight = (a: (typeof ANCHORS)[number]) =>
           a.angle > 0 || a.angle === 0 || Math.abs(a.angle) === 180 ? 3 : 1;
         const pickAnchor = () => {
-          const pool = ANCHORS.filter((a) => a.i !== lastTapped);
+          let pool = ANCHORS.filter((a) => a.i !== lastTapped && fits(a));
+          if (!pool.length) pool = ANCHORS.filter((a) => a.i !== lastTapped);
           const sum = pool.reduce((t, a) => t + weight(a), 0);
           let r = Math.random() * sum;
           for (const a of pool) {
@@ -697,6 +769,7 @@ export function TrailCursor() {
         const tour = async () => {
           maxLen = 640; // from now on the trail is a comet tail
           while (alive) {
+            measure(svg); // the layout may have changed (rotation, resize)
             const a = pickAnchor();
             const route = planLeg(a, Math.random() < 0.35);
             atLetter = -1;
